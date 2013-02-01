@@ -94,7 +94,7 @@
             $this->register_action('plugin.post_query', array($this, 'post_query'));
             $this->add_texts('localization/', false);
             $this->skin = $this->rc->config->get('skin');
-            $this->include_script('advanced_search.js');
+            $this->include_script('advanced_search.min.js');
 
             if ($this->rc->task == 'mail') {
                 $file = 'skins/' . $this->skin . '/advanced_search.css';
