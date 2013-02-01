@@ -24,30 +24,30 @@ folder for details on the skin license.
 ## Download
 
 ### GIT :
-* Clone the GitHub repository to 'advanced _ search':
+* Clone the GitHub repository to 'advanced_search':
 
  >     git clone git://github.com/GMS-SA/roundcube-advanced-search.git advanced_search
 
 * Change to the 'stable' branch:
 
  >     cd advanced_search
- >     git checkout -b stable
+ >     git checkout origin/stable
 
 ### ZIP :
 * Swap branches to 'stable'
 * Click on the 'ZIP' download icon
-* Rename the unziped directory 'advanced _ search'
+* Rename the unziped directory 'advanced_search'
 
 ## Install
 
-* Place the 'advanced _ search' plugin folder into the plugins directory of Roundcube.
+* Place the 'advanced_search' plugin folder into the plugins directory of Roundcube.
 * If using git and not wanting all the '.git' repository data in your live webmail:
 
  >     cd advanced_search
  >     git archive --format=tar --prefix=advanced_search/ stable | tar -x -C /path/to/roundcube/plugins/
 
   This will give you a git-free copy of the stable branch.
-* Add advanced _ search to $rcmail _ config['plugins'] in your Roundcube config
+* Add advanced_search to $rcmail_config['plugins'] in your Roundcube config
 
 ## Credits
 
