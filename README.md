@@ -4,6 +4,8 @@ Advanced Search Plugin for Roundcube
 
 ## Usage
 
+After install, 'Advanced search' will show up under the 'more' menu.
+
 Please use the _'stable'_ brach for deployment.
 
 Advantages:
@@ -53,4 +55,5 @@ folder for details on the skin license.
 
 * Wilwert Claude
 * Ludovicy Steve
+* Moules Chris
 * [Global Media Systems](http://www.gms.lu)
