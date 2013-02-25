@@ -18,8 +18,8 @@
          * @namespace
          */
         folders: {},
-        criterias: {},
-        prefered_criterias: {},
+        criteria: {},
+        prefered_criteria: {},
         messages: null
     };
 
@@ -98,8 +98,8 @@
      */
     rcmail.addEventListener('plugin.show', function(r) {
         $.stack.folders = r.folders;
-        $.stack.criterias = r.criterias;
-        $.stack.prefered_criterias = r.prefered_criterias;
+        $.stack.criteria = r.criteria;
+        $.stack.prefered_criteria = r.prefered_criteria;
 
         var $html = $(createCriteria(true));
 

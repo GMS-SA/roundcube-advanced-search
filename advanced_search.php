@@ -33,28 +33,28 @@
          * @var array
          * @access private
          */
-        private $dates = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
+        private $date_criteria = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
         /**
          * Every criteria which doesn't take an argument
          *
          * @var array
          * @access private
          */
-        private $no_value = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'NEW', 'OLD', 'RECENT', 'SEEN');
+        private $flag_criteria = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'SEEN');
         /**
-         * Prefered criterias to show on the top of lists
+         * Prefered criteria to show on the top of lists
          *
          * @var array
          * @access private
          */
-        private $prefered_criterias = array('SUBJECT', 'HEADER TO', 'CC', 'BCC', 'HEADER FROM');
+        private $prefered_criteria = array('SUBJECT', 'BODY', 'HEADER FROM', 'HEADER TO', 'SENTSINCE', 'LARGER');
         /**
-         * All filter criterias
+         * All filter criteria
          *
          * @var array
          * @access private
          */
-        private $criterias = array(
+        private $criteria = array(
             'ANSWERED' => 'Answered',
             'BCC' => 'Bcc',
             'BEFORE' => 'Before',
@@ -114,7 +114,7 @@
         // {{{ format_input()
 
         /**
-         * This function formats some incoming criterias (by javascript) into IMAP compatible criterias
+         * This function formats some incoming criteria (by javascript) into IMAP compatible criteria
          *
          * @param array $input The requested search parameters
          * @access public
@@ -146,7 +146,7 @@
         /**
          * This function converts the preconfigured query parts (as array) into an IMAP compatible string
          *
-         * @param array $command_array An array containing the advanced search criterias
+         * @param array $command_array An array containing the advanced search criteria
          * @access public
          * @return The command string
          */
@@ -200,10 +200,10 @@
 
                 $command_str .= $v['filter'];
 
-                if (in_array($v['filter'], $this->dates)) {
+                if (in_array($v['filter'], $this->date_criteria)) {
                     $command_str .= ' ' . $this->quote(date("d-M-Y", strtotime($v['filter-val'])));
                 } else {
-                    if (!in_array($v['filter'], $this->no_value)) {
+                    if (!in_array($v['filter'], $this->flag_criteria)) {
                         $command_str .= ' ' . $this->quote($v['filter-val']);
                     }
                 }
@@ -354,8 +354,8 @@
             }
 
             $ret = array('folders' => $folders,
-                         'criterias' => $this->criterias,
-                         'prefered_criterias' => $this->prefered_criterias);
+                         'criteria' => $this->criteria,
+                         'prefered_criteria' => $this->prefered_criteria);
 
             $this->rc->output->command('plugin.show', $ret);
         }
