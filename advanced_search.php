@@ -90,6 +90,13 @@
             'SMALLER' => 'Smaller Than',
             'SUBJECT' => 'Subject Contains'
         );
+        /**
+         * Localization strings
+         *
+         * @var array
+         * @access private
+         */
+        private $i18n_strings = array();
         // }}}
         // {{{ init()
 
@@ -103,8 +110,9 @@
             $this->rc = rcmail::get_instance();
             $this->register_action('plugin.prepare_filter', array($this, 'prepare_filter'));
             $this->register_action('plugin.post_query', array($this, 'post_query'));
-            $this->add_texts('localization/', false);
             $this->skin = $this->rc->config->get('skin');
+            $this->add_texts('localization', true);
+            $this->populate_i18n();
             $this->include_script('advanced_search.js');
 
             if ($this->rc->task == 'mail') {
@@ -120,6 +128,34 @@
                     $this->mail_search_handler();
                 }
             }
+        }
+        // }}}
+        // {{{ populate_i18n()
+
+        /**
+         * This function populates an array with localization texts.
+         * This is needed as ew are using a lot of localizations from core.
+         * The core localizations are not avalable directly in JS
+         *
+         * @access private
+         */
+        private function populate_i18n()
+        {
+            // From Roundcube core localization
+            $this->i18n_strings['advsearch'] = $this->rc->gettext('advsearch');
+            $this->i18n_strings['search'] = $this->rc->gettext('search');
+            $this->i18n_strings['resetsearch'] = $this->rc->gettext('resetsearch');
+            $this->i18n_strings['addfield'] = $this->rc->gettext('addfield');
+            $this->i18n_strings['delete'] = $this->rc->gettext('delete');
+            // From plugin localization
+            $this->i18n_strings['in'] = $this->gettext('in');
+            $this->i18n_strings['and'] = $this->gettext('and');
+            $this->i18n_strings['or'] = $this->gettext('or');
+            $this->i18n_strings['not'] = $this->gettext('not');
+            $this->i18n_strings['where'] = $this->gettext('where');
+            $this->i18n_strings['exclude'] = $this->gettext('exclude');
+            $this->i18n_strings['andsubfolders'] = $this->gettext('andsubfolders');
+            $this->i18n_strings['allfolders'] = $this->gettext('allfolders');
         }
         // }}}
         // {{{ format_input()
@@ -348,7 +384,7 @@
             $this->api->add_content(html::tag('li', null,
                 $this->api->output->button(array(
                     'command'    => 'plugin.advanced_search',
-                    'label'      => 'advanced_search.label',
+                    'label'      => 'advsearch',
                     'type'       => 'link',
                     'classact'   => 'icon advanced-search active',
                     'class'      => 'icon advanced-search',
@@ -374,6 +410,7 @@
             }
 
             $ret = array('folders' => $folders,
+                         'i18n_strings' => $this->i18n_strings,
                          'criteria' => $this->criteria,
                          'date_criteria' => $this->date_criteria,
                          'flag_criteria' => $this->flag_criteria,

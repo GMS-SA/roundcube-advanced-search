@@ -18,6 +18,7 @@
          * @namespace
          */
         folders: {},
+        i18n_strings: {},
         criteria: {},
         date_criteria: {},
         flag_criteria: {},
@@ -43,20 +44,20 @@
             html.push('<table id="adv-search">');
             html.push('<thead><tr><td>');
 
-            html.push('<input type="submit" name="search" class="button mainaction" value="Search" /></td> <td> in: <select name="folder">');
-            html.push('<option value="all">All folders</option>');
+            html.push('<input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td> <td> ' + $.stack.i18n_strings['in'] + ': <select name="folder">');
+            html.push('<option value="all">' + $.stack.i18n_strings['allfolders'] + '</option>');
 
             for(var i in $.stack.folders) {
                 html.push('<option value="'+i+'">'+$.stack.folders[i]+'</option>');
             }
 
             html.push('</select>');
-            html.push('<span class="sub-folders"> and subfolders <input type="checkbox" name="subfolder"> </span> where : ');
+            html.push('<span class="sub-folders"> ' + $.stack.i18n_strings['andsubfolders'] + ': <input type="checkbox" name="subfolder"> </span> ' + $.stack.i18n_strings['where'] + ': ');
             html.push('</td></tr></thead>');
             html.push('<tbody><tr><td class="adv-search-and-or"> </td><td>');
         } else {
             html.push('<tr><td class="adv-search-and-or"> ');
-            html.push('<select name="method"><option value="and">And</option><option value="or">Or</option></select>');
+            html.push('<select name="method"><option value="and">' + $.stack.i18n_strings['and'] + '</option><option value="or">' + $.stack.i18n_strings['or'] + '</option></select>');
             html.push('</td><td>');
         }
 
@@ -98,20 +99,20 @@
         }
 
         html.push('</optgroup></select>');
-        html.push(' Not<input type="checkbox" name="not" /><input type="text" name="filter-val" />');
-        html.push(' Exclude:<input type="checkbox" name="filter-exclude" />');
-        html.push('<button name="add" class="add">Add row</button>');
+        html.push(' ' + $.stack.i18n_strings['not'] + '<input type="checkbox" name="not" /><input type="text" name="filter-val" />');
+        html.push(' ' + $.stack.i18n_strings['exclude'] + ':<input type="checkbox" name="filter-exclude" />');
+        html.push('<button name="add" class="add">' + $.stack.i18n_strings['addfield'] + '</button>');
 
         if (!first) {
-            html.push('<button name="delete" class="delete">Delete</button>');
+            html.push('<button name="delete" class="delete">' + $.stack.i18n_strings['delete'] + '</button>');
         }
 
         html.push('</td></tr>');
 
         if (first) {
             html.push('</tbody><tfoot><tr>');
-            html.push('<td><input type="submit" name="search" class="button mainaction" value="Search" /></td>');
-            html.push('<td><input type="reset" name="reset" class="button reset" value="Reset" /></td>');
+            html.push('<td><input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td>');
+            html.push('<td><input type="reset" name="reset" class="button reset" value="' + $.stack.i18n_strings['resetsearch'] + '" /></td>');
             html.push('</tr></tfoot></table></form></div>');
         }
 
@@ -128,6 +129,7 @@
      */
     rcmail.addEventListener('plugin.show', function(r) {
         $.stack.folders = r.folders;
+        $.stack.i18n_strings = r.i18n_strings;
         $.stack.criteria = r.criteria;
         $.stack.date_criteria = r.date_criteria;
         $.stack.flag_criteria = r.flag_criteria;
@@ -144,7 +146,7 @@
             height: 300,
             resizable: true,
             draggable: true,
-            title: 'Advanced search',
+            title: $.stack.i18n_strings['advsearch'],
             close: function() {
                 $(this).remove();
             }
