@@ -212,11 +212,20 @@
                 $command_str .= $v['filter'];
 
                 if (in_array($v['filter'], $this->date_criteria)) {
-                    $command_str .= ' ' . $this->quote(date("d-M-Y", strtotime($v['filter-val'])));
-                } else {
-                    if (!in_array($v['filter'], $this->flag_criteria)) {
-                        $command_str .= ' ' . $this->quote($v['filter-val']);
+                    $date_format = $this->rc->config->get('date_format');
+                    try {
+                        $date = DateTime::createFromFormat($date_format, $v['filter-val']);
+                        $command_str .= ' ' . $this->quote(date_format($date, "d-M-Y"));
                     }
+                    catch (Exception $e) {
+                        $date_format = preg_replace('/(\w)/','%$1', $date_format);
+                        $date_array = strptime($v['filter-val'], $date_format);
+                        $unix_ts = mktime($date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon']+1, $date_array['tm_mday'], $date_array['tm_year']+1900);
+                        $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
+                    }
+
+                } else if (!in_array($v['filter'], $this->flag_criteria)) {
+                        $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
 
                 $command[] = array('method' => isset($v['method']) ? $v['method'] : 'and',
