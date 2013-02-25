@@ -19,7 +19,11 @@
          */
         folders: {},
         criteria: {},
+        date_criteria: {},
+        flag_criteria: {},
+        email_criteria: {},
         prefered_criteria: {},
+        other_criteria: {},
         messages: null
     };
 
@@ -31,14 +35,15 @@
      */
     function createCriteria(first) {
         var html = [];
+        var current_criteria;
 
         if (first) {
             html.push('<div id="adsearch-popup">');
             html.push('<form method="post" action="#">');
             html.push('<table id="adv-search">');
-            html.push('<thead><tr><td colspan="2">');
+            html.push('<thead><tr><td>');
 
-            html.push('Search in: <select name="folder">');
+            html.push('<input type="submit" name="search" class="button mainaction" value="Search" /></td> <td> in: <select name="folder">');
             html.push('<option value="all">All folders</option>');
 
             for(var i in $.stack.folders) {
@@ -48,23 +53,48 @@
             html.push('</select>');
             html.push('<span class="sub-folders"> and subfolders <input type="checkbox" name="subfolder"> </span> where : ');
             html.push('</td></tr></thead>');
-            html.push('<tbody><tr><td> </td><td>');
+            html.push('<tbody><tr><td class="adv-search-and-or"> </td><td>');
         } else {
-            html.push('<tr><td> ');
+            html.push('<tr><td class="adv-search-and-or"> ');
             html.push('<select name="method"><option value="and">And</option><option value="or">Or</option></select>');
             html.push('</td><td>');
         }
 
         html.push('<select name="filter">');
 
-        for(var i in $.stack.prefered_criterias) {
-            html.push('<option value="'+$.stack.prefered_criterias[i]+'">'+$.stack.criterias[$.stack.prefered_criterias[i]]+'</option>');
+        html.push('<optgroup label="Common">');
+
+        for(var i in $.stack.prefered_criteria) {
+            current_criteria = $.stack.prefered_criteria[i];
+            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
         }
 
-        html.push('<optgroup label="All criterias">'); 
+        html.push('<optgroup label="Addresses">');
 
-        for(var i in $.stack.criterias) {
-            html.push('<option value="'+i+'">'+$.stack.criterias[i]+'</option>');
+        for(var i in $.stack.email_criteria) {
+            current_criteria = $.stack.email_criteria[i];
+            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
+        }
+
+        html.push('<optgroup label="Dates">');
+
+        for(var i in $.stack.date_criteria) {
+            current_criteria = $.stack.date_criteria[i];
+            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
+        }
+
+        html.push('<optgroup label="Flags">');
+
+        for(var i in $.stack.flag_criteria) {
+            current_criteria = $.stack.flag_criteria[i];
+            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
+        }
+
+        html.push('<optgroup label="Other">');
+
+        for(var i in $.stack.other_criteria) {
+            current_criteria = $.stack.other_criteria[i];
+            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
         }
 
         html.push('</optgroup></select>');
@@ -79,9 +109,9 @@
         html.push('</td></tr>');
 
         if (first) {
-            html.push('</tbody><tfoot><tr><td colspan="2">');
-            html.push('<input type="button" name="search" class="button mainaction" value="Search" />');
-            html.push('<input type="button" name="reset" class="button reset" value="Reset" />');
+            html.push('</tbody><tfoot><tr>');
+            html.push('<td><input type="submit" name="search" class="button mainaction" value="Search" /></td>');
+            html.push('<td><input type="reset" name="reset" class="button reset" value="Reset" /></td>');
             html.push('</tr></tfoot></table></form></div>');
         }
 
@@ -99,14 +129,18 @@
     rcmail.addEventListener('plugin.show', function(r) {
         $.stack.folders = r.folders;
         $.stack.criteria = r.criteria;
+        $.stack.date_criteria = r.date_criteria;
+        $.stack.flag_criteria = r.flag_criteria;
+        $.stack.email_criteria = r.email_criteria;
         $.stack.prefered_criteria = r.prefered_criteria;
+        $.stack.other_criteria = r.other_criteria;
 
         var $html = $(createCriteria(true));
 
         $('select[name=folder]', $html).val(rcmail.env.mailbox);
 
         $html.dialog({
-            width: 550,
+            width: 600,
             height: 300,
             resizable: true,
             draggable: true,

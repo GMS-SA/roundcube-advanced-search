@@ -28,6 +28,13 @@
          */
         private $target_menu = 'messagemenu';
         /**
+         * Every criteria which takes a email as argument
+         *
+         * @var array
+         * @access private
+         */
+        private $email_criteria = array('HEADER FROM', 'HEADER TO', 'CC', 'BCC');
+        /**
          * Every criteria which takes a date as argument
          *
          * @var array
@@ -49,6 +56,13 @@
          */
         private $prefered_criteria = array('SUBJECT', 'BODY', 'HEADER FROM', 'HEADER TO', 'SENTSINCE', 'LARGER');
         /**
+         * Other criteria, anything not in the above lists, except 'prefered_criteria'
+         *
+         * @var array
+         * @access private
+         */
+        private $other_criteria = array('SUBJECT', 'BODY', 'KEYWORD', 'LARGER', 'SMALLER');
+        /**
          * All filter criteria
          *
          * @var array
@@ -65,16 +79,13 @@
             'KEYWORD' => 'Keyword',
             'LARGER' => 'Larger Than',
             'BODY' => 'Message Body',
-            'NEW' => 'New',
-            'OLD' => 'Old',
             'ON' => 'On',
-            'RECENT' => 'Recent',
-            'SEEN' => 'Seen',
+            'SEEN' => 'Read',
             'SENTBEFORE' => 'Sent Before',
-            'HEADER FROM' => 'Sent By',
+            'HEADER FROM' => 'From',
             'SENTON' => 'Sent On',
             'SENTSINCE' => 'Sent Since',
-            'HEADER TO' => 'Sent To',
+            'HEADER TO' => 'To',
             'SINCE' => 'Since',
             'SMALLER' => 'Smaller Than',
             'SUBJECT' => 'Subject Contains'
@@ -355,7 +366,11 @@
 
             $ret = array('folders' => $folders,
                          'criteria' => $this->criteria,
-                         'prefered_criteria' => $this->prefered_criteria);
+                         'date_criteria' => $this->date_criteria,
+                         'flag_criteria' => $this->flag_criteria,
+                         'email_criteria' => $this->email_criteria,
+                         'prefered_criteria' => $this->prefered_criteria,
+                         'other_criteria' => $this->other_criteria);
 
             $this->rc->output->command('plugin.show', $ret);
         }

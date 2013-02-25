@@ -35,6 +35,11 @@ span.advanced-search {
     width: 100%;
 }
 
+td.adv-search-and-or {
+    width: 80px;
+    text-align: center;
+}
+
 #adsearch-popup .mainaction {
     height: 24px;
     padding-left: 10px;
