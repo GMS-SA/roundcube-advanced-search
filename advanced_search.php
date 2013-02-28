@@ -201,25 +201,53 @@
         {
             $command = array();
             $paranthesis = 0;
+            $prev_method = null;
+            $next_method = null;
+            $cnt = count($command_array);
 
             foreach($command_array as $k => $v) {
                 $part = '';
+                $next_method = 'unknown';
 
-                if ($v['method'] == 'or' && $k != count($command_array)-1) {
-                    $part .= '(' . strtoupper($v['method']) . ' ';
-                    $paranthesis++;
+                // Lookup next method
+                if($k < $cnt-1) {
+                    $next_method = $command_array[$k+1]['method'];
                 }
 
-                $command[] = $part . $v['command'];
+                // If previous option was OR, close any open brakets
+                if($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
+                    for( ; $paranthesis > 0; $paranthesis--) {
+                        $part .= ')';
+                    }
+                }
+
+                // If there are two consecutive ORs, add brakets
+                // If the next option is a new OR, add the prefix here
+                // If the next option is _not_ a OR, and the current option is AND, prefix ALL
+                if($next_method == 'or') {
+                    if($v['method'] == 'or') {
+                        $part .= ' (';
+                        $paranthesis++;
+                    }
+                    $part .= ' OR ';
+                } else if($v['method'] == 'and') {
+                    $part .= ' ALL ';
+                }
+
+                $part .= $v['command'];
+
+                // If this is the end of the query, and we have open brakets, close them
+                if($k == $cnt-1 && $paranthesis > 0) {
+                    for( ; $paranthesis > 0; $paranthesis--) {
+                        $part .= ')';
+                    }
+                }
+
+                $prev_method = $v['method'];
+                $command[] = $part;
             }
 
             $command = implode(' ', $command);
-
-            if ($paranthesis > 0) {
-                for($i=0; $i<$paranthesis; $i++) {
-                    $command .= ')';
-                }
-            }
 
             return $command;
         }
