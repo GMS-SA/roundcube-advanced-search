@@ -33,7 +33,7 @@ folder for details on the skin license.
 * Change to the 'stable' branch:
 
  >     cd advanced_search
- >     git checkout origin/stable
+ >     git checkout -b stable origin/stable
 
 ### ZIP :
 * Swap branches to 'stable'
