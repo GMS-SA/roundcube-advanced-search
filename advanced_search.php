@@ -2,10 +2,11 @@
     /**
      * Processing an advanced search over an E-Mail Account
      *
-     * @version 1.0
+     * @version 1.1
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
+     * @author  Chris Moules
      * @website http://www.gms.lu
      */
 
@@ -28,33 +29,47 @@
          */
         private $target_menu = 'messagemenu';
         /**
+         * Every criteria which takes a email as argument
+         *
+         * @var array
+         * @access private
+         */
+        private $email_criteria = array('HEADER FROM', 'HEADER TO', 'CC', 'BCC');
+        /**
          * Every criteria which takes a date as argument
          *
          * @var array
          * @access private
          */
-        private $dates = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
+        private $date_criteria = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
         /**
          * Every criteria which doesn't take an argument
          *
          * @var array
          * @access private
          */
-        private $no_value = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'NEW', 'OLD', 'RECENT', 'SEEN');
+        private $flag_criteria = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'SEEN');
         /**
-         * Prefered criterias to show on the top of lists
+         * Prefered criteria to show on the top of lists
          *
          * @var array
          * @access private
          */
-        private $prefered_criterias = array('SUBJECT', 'HEADER TO', 'CC', 'BCC', 'HEADER FROM');
+        private $prefered_criteria = array('SUBJECT', 'BODY', 'HEADER FROM', 'HEADER TO', 'SENTSINCE', 'LARGER');
         /**
-         * All filter criterias
+         * Other criteria, anything not in the above lists, except 'prefered_criteria'
          *
          * @var array
          * @access private
          */
-        private $criterias = array(
+        private $other_criteria = array('SUBJECT', 'BODY', 'KEYWORD', 'LARGER', 'SMALLER');
+        /**
+         * All filter criteria
+         *
+         * @var array
+         * @access private
+         */
+        private $criteria = array(
             'ANSWERED' => 'Answered',
             'BCC' => 'Bcc',
             'BEFORE' => 'Before',
@@ -65,20 +80,24 @@
             'KEYWORD' => 'Keyword',
             'LARGER' => 'Larger Than',
             'BODY' => 'Message Body',
-            'NEW' => 'New',
-            'OLD' => 'Old',
             'ON' => 'On',
-            'RECENT' => 'Recent',
-            'SEEN' => 'Seen',
+            'SEEN' => 'Read',
             'SENTBEFORE' => 'Sent Before',
-            'HEADER FROM' => 'Sent By',
+            'HEADER FROM' => 'From',
             'SENTON' => 'Sent On',
             'SENTSINCE' => 'Sent Since',
-            'HEADER TO' => 'Sent To',
+            'HEADER TO' => 'To',
             'SINCE' => 'Since',
             'SMALLER' => 'Smaller Than',
             'SUBJECT' => 'Subject Contains'
         );
+        /**
+         * Localization strings
+         *
+         * @var array
+         * @access private
+         */
+        private $i18n_strings = array();
         // }}}
         // {{{ init()
 
@@ -92,9 +111,10 @@
             $this->rc = rcmail::get_instance();
             $this->register_action('plugin.prepare_filter', array($this, 'prepare_filter'));
             $this->register_action('plugin.post_query', array($this, 'post_query'));
-            $this->add_texts('localization/', false);
             $this->skin = $this->rc->config->get('skin');
             $this->include_script('advanced_search.min.js');
+            $this->add_texts('localization', true);
+            $this->populate_i18n();
 
             if ($this->rc->task == 'mail') {
                 $file = 'skins/' . $this->skin . '/advanced_search.css';
@@ -111,10 +131,38 @@
             }
         }
         // }}}
+        // {{{ populate_i18n()
+
+        /**
+         * This function populates an array with localization texts.
+         * This is needed as ew are using a lot of localizations from core.
+         * The core localizations are not avalable directly in JS
+         *
+         * @access private
+         */
+        private function populate_i18n()
+        {
+            // From Roundcube core localization
+            $this->i18n_strings['advsearch'] = $this->rc->gettext('advsearch');
+            $this->i18n_strings['search'] = $this->rc->gettext('search');
+            $this->i18n_strings['resetsearch'] = $this->rc->gettext('resetsearch');
+            $this->i18n_strings['addfield'] = $this->rc->gettext('addfield');
+            $this->i18n_strings['delete'] = $this->rc->gettext('delete');
+            // From plugin localization
+            $this->i18n_strings['in'] = $this->gettext('in');
+            $this->i18n_strings['and'] = $this->gettext('and');
+            $this->i18n_strings['or'] = $this->gettext('or');
+            $this->i18n_strings['not'] = $this->gettext('not');
+            $this->i18n_strings['where'] = $this->gettext('where');
+            $this->i18n_strings['exclude'] = $this->gettext('exclude');
+            $this->i18n_strings['andsubfolders'] = $this->gettext('andsubfolders');
+            $this->i18n_strings['allfolders'] = $this->gettext('allfolders');
+        }
+        // }}}
         // {{{ format_input()
 
         /**
-         * This function formats some incoming criterias (by javascript) into IMAP compatible criterias
+         * This function formats some incoming criteria (by javascript) into IMAP compatible criteria
          *
          * @param array $input The requested search parameters
          * @access public
@@ -146,7 +194,7 @@
         /**
          * This function converts the preconfigured query parts (as array) into an IMAP compatible string
          *
-         * @param array $command_array An array containing the advanced search criterias
+         * @param array $command_array An array containing the advanced search criteria
          * @access public
          * @return The command string
          */
@@ -154,25 +202,53 @@
         {
             $command = array();
             $paranthesis = 0;
+            $prev_method = null;
+            $next_method = null;
+            $cnt = count($command_array);
 
             foreach($command_array as $k => $v) {
                 $part = '';
+                $next_method = 'unknown';
 
-                if ($v['method'] == 'or' && $k != count($command_array)-1) {
-                    $part .= '(' . strtoupper($v['method']) . ' ';
-                    $paranthesis++;
+                // Lookup next method
+                if($k < $cnt-1) {
+                    $next_method = $command_array[$k+1]['method'];
                 }
 
-                $command[] = $part . $v['command'];
+                // If previous option was OR, close any open brakets
+                if($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
+                    for( ; $paranthesis > 0; $paranthesis--) {
+                        $part .= ')';
+                    }
+                }
+
+                // If there are two consecutive ORs, add brakets
+                // If the next option is a new OR, add the prefix here
+                // If the next option is _not_ a OR, and the current option is AND, prefix ALL
+                if($next_method == 'or') {
+                    if($v['method'] == 'or') {
+                        $part .= ' (';
+                        $paranthesis++;
+                    }
+                    $part .= ' OR ';
+                } else if($v['method'] == 'and') {
+                    $part .= ' ALL ';
+                }
+
+                $part .= $v['command'];
+
+                // If this is the end of the query, and we have open brakets, close them
+                if($k == $cnt-1 && $paranthesis > 0) {
+                    for( ; $paranthesis > 0; $paranthesis--) {
+                        $part .= ')';
+                    }
+                }
+
+                $prev_method = $v['method'];
+                $command[] = $part;
             }
 
             $command = implode(' ', $command);
-
-            if ($paranthesis > 0) {
-                for($i=0; $i<$paranthesis; $i++) {
-                    $command .= ')';
-                }
-            }
 
             return $command;
         }
@@ -200,12 +276,21 @@
 
                 $command_str .= $v['filter'];
 
-                if (in_array($v['filter'], $this->dates)) {
-                    $command_str .= ' ' . $this->quote(date("d-M-Y", strtotime($v['filter-val'])));
-                } else {
-                    if (!in_array($v['filter'], $this->no_value)) {
-                        $command_str .= ' ' . $this->quote($v['filter-val']);
+                if (in_array($v['filter'], $this->date_criteria)) {
+                    $date_format = $this->rc->config->get('date_format');
+                    try {
+                        $date = DateTime::createFromFormat($date_format, $v['filter-val']);
+                        $command_str .= ' ' . $this->quote(date_format($date, "d-M-Y"));
                     }
+                    catch (Exception $e) {
+                        $date_format = preg_replace('/(\w)/','%$1', $date_format);
+                        $date_array = strptime($v['filter-val'], $date_format);
+                        $unix_ts = mktime($date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon']+1, $date_array['tm_mday'], $date_array['tm_year']+1900);
+                        $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
+                    }
+
+                } else if (!in_array($v['filter'], $this->flag_criteria)) {
+                        $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
 
                 $command[] = array('method' => isset($v['method']) ? $v['method'] : 'and',
@@ -328,7 +413,7 @@
             $this->api->add_content(html::tag('li', null,
                 $this->api->output->button(array(
                     'command'    => 'plugin.advanced_search',
-                    'label'      => 'advanced_search.label',
+                    'label'      => 'advsearch',
                     'type'       => 'link',
                     'classact'   => 'icon advanced-search active',
                     'class'      => 'icon advanced-search',
@@ -354,8 +439,13 @@
             }
 
             $ret = array('folders' => $folders,
-                         'criterias' => $this->criterias,
-                         'prefered_criterias' => $this->prefered_criterias);
+                         'i18n_strings' => $this->i18n_strings,
+                         'criteria' => $this->criteria,
+                         'date_criteria' => $this->date_criteria,
+                         'flag_criteria' => $this->flag_criteria,
+                         'email_criteria' => $this->email_criteria,
+                         'prefered_criteria' => $this->prefered_criteria,
+                         'other_criteria' => $this->other_criteria);
 
             $this->rc->output->command('plugin.show', $ret);
         }
