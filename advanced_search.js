@@ -320,6 +320,16 @@
     });
 
     /**
+     * Stop propagation of keydown and keypress events.
+     * This should stop these events being processed by other listeners in the mailbox.
+     *
+     * @param {object} e The event element
+     */
+    $("#adsearch-popup").live('keydown keypress', function(e) {
+        e.stopPropagation();
+    });
+
+    /**
      * The roundcube init funtion, which registers and enables the advanced search command. 
      */
     rcmail.addEventListener('init', function() {
