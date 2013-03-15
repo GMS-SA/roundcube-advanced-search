@@ -289,8 +289,11 @@
                         $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
                     }
 
+                } else if (in_array($v['filter'], $this->email_criteria)) {
+                    // Tidy autocomplete which adds ', ' to email
+                    $command_str .= ' ' . $this->quote(trim($v['filter-val']," \t,"));
                 } else if (!in_array($v['filter'], $this->flag_criteria)) {
-                        $command_str .= ' ' . $this->quote($v['filter-val']);
+                    $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
 
                 $command[] = array('method' => isset($v['method']) ? $v['method'] : 'and',
