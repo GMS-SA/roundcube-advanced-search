@@ -2,7 +2,7 @@
     /**
      * Processing an advanced search over an E-Mail Account
      *
-     * @version 1.1
+     * @version 1.1.1
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -230,9 +230,9 @@
                         $part .= ' (';
                         $paranthesis++;
                     }
-                    $part .= ' OR ';
+                    $part .= 'OR ';
                 } else if($v['method'] == 'and') {
-                    $part .= ' ALL ';
+                    $part .= 'ALL ';
                 }
 
                 $part .= $v['command'];
