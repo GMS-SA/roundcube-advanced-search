@@ -1,5 +1,5 @@
 {
-	"name": "GMS-SA/advanced-search",
+	"name": "gms-sa/advanced-search",
 	"type": "roundcube-plugin",
 	"description": "Advanced search allowing multiple search criteria and folder recursion",
 	"keywords": ["mail","search","advanced"],
