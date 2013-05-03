@@ -230,9 +230,9 @@
                         $part .= ' (';
                         $paranthesis++;
                     }
-                    $part .= ' OR ';
+                    $part .= 'OR ';
                 } else if($v['method'] == 'and') {
-                    $part .= ' ALL ';
+                    $part .= 'ALL ';
                 }
 
                 $part .= $v['command'];
