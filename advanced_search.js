@@ -151,52 +151,54 @@
      * @param {object} e The event element
      */
     $('select[name=filter]').live('change', function(e) {
-        var row_input = $(this).nextUntil('tr','input[name=filter-val]');
-        var old_avs_type = row_input.data("avs_type");
+        var $row_input = $(this).nextUntil('tr', 'input[name=filter-val]'),
+            old_avs_type = $row_input.data("avs_type");
         
-        if( $.inArray($(this).val(), $.stack.date_criteria) >= 0 ) {
+        if ($.inArray($(this).val(), $.stack.date_criteria) >= 0) {
             if(old_avs_type !== "date") {
-                row_input.val('');
-                row_input.datepicker({dateFormat: rcmail.env.date_format});
+                $row_input.val('');
+                $row_input.datepicker({dateFormat: rcmail.env.date_format});
             }
-            row_input.data("avs_type","date");
-        }
-        else if( $.inArray($(this).val(), $.stack.email_criteria) >= 0 ) {
+
+            $row_input.data("avs_type", "date");
+        } else if ($.inArray($(this).val(), $.stack.email_criteria) >= 0) {
             if(old_avs_type !== "email") {
-                rcmail.init_address_input_events(row_input, "");
+                rcmail.init_address_input_events($row_input, "");
                 rcmail.addEventListener('autocomplete_insert', function(e){ 
                     e.field.value = e.insert.replace(/.*<(\S*?@\S*?)>.*/, "$1");
                 });
             }
-            row_input.data("avs_type","email");
-        }
-        else if( $.inArray($(this).val(), $.stack.flag_criteria) >= 0 ) {
-            if(old_avs_type !== "flag_criteria") {
-                row_input.val('');
-                row_input.hide();
+
+            $row_input.data("avs_type", "email");
+        } else if ($.inArray($(this).val(), $.stack.flag_criteria) >= 0) {
+            if (old_avs_type !== "flag_criteria") {
+                $row_input.val('');
+                $row_input.hide();
             }
-            row_input.data("avs_type","flag_criteria");
-        }
-        else {
-            row_input.data("avs_type","none");
+
+            $row_input.data("avs_type", "flag_criteria");
+        } else {
+            $row_input.data("avs_type", "none");
         }
 
         switch (old_avs_type) {
             case "date":
-                if( (row_input.data("avs_type") !== "date") && row_input.hasClass("hasDatepicker") )
-                    row_input.datepicker("destroy");
-                break;
-            case "email":
-                if( (row_input.data("avs_type") !== "email") ) {
-                    row_input.removeAttr("autocomplete");
-                    row_input.unbind('keydown');
-                    row_input.unbind('keypress');
+                if (($row_input.data("avs_type") !== "date") && $row_input.hasClass("hasDatepicker")) {
+                    $row_input.datepicker("destroy");
                 }
-                break;
+            break;
+            case "email":
+                if (($row_input.data("avs_type") !== "email")) {
+                    $row_input.removeAttr("autocomplete");
+                    $row_input.unbind('keydown');
+                    $row_input.unbind('keypress');
+                }
+            break;
             case "flag_criteria":
-                if( (row_input.data("avs_type") !== "flag_criteria") && !row_input.is(":visible") )
-                    row_input.show();
-                break;
+                if (($row_input.data("avs_type") !== "flag_criteria") && !$row_input.is(":visible")) {
+                    $row_input.show();
+                }
+            break;
         }
     });
 

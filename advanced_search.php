@@ -35,6 +35,7 @@
          * Initialisation of the plugin
          *
          * @access public
+         * @return null
          */
         function init()
         {
@@ -70,6 +71,7 @@
          * The core localizations are not avalable directly in JS
          *
          * @access private
+         * @return null
          */
         private function populate_i18n()
         {
@@ -138,12 +140,12 @@
                 $next_method = 'unknown';
 
                 // Lookup next method
-                if($k < $cnt-1) {
+                if ($k < $cnt-1) {
                     $next_method = $command_array[$k+1]['method'];
                 }
 
                 // If previous option was OR, close any open brakets
-                if($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
+                if ($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
                     for( ; $paranthesis > 0; $paranthesis--) {
                         $part .= ')';
                     }
@@ -152,11 +154,12 @@
                 // If there are two consecutive ORs, add brakets
                 // If the next option is a new OR, add the prefix here
                 // If the next option is _not_ a OR, and the current option is AND, prefix ALL
-                if($next_method == 'or') {
-                    if($v['method'] == 'or') {
+                if ($next_method == 'or') {
+                    if ($v['method'] == 'or') {
                         $part .= ' (';
                         $paranthesis++;
                     }
+                    
                     $part .= 'OR ';
                 } else if($v['method'] == 'and') {
                     $part .= 'ALL ';
@@ -205,20 +208,19 @@
 
                 if (in_array($v['filter'], $this->rc->config->get('date_criteria'))) {
                     $date_format = $this->rc->config->get('date_format');
+                    
                     try {
                         $date = DateTime::createFromFormat($date_format, $v['filter-val']);
                         $command_str .= ' ' . $this->quote(date_format($date, "d-M-Y"));
-                    }
-                    catch (Exception $e) {
+                    } catch (Exception $e) {
                         $date_format = preg_replace('/(\w)/','%$1', $date_format);
                         $date_array = strptime($v['filter-val'], $date_format);
                         $unix_ts = mktime($date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon']+1, $date_array['tm_mday'], $date_array['tm_year']+1900);
                         $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
                     }
-
                 } else if (in_array($v['filter'], $this->rc->config->get('email_criteria'))) {
                     // Tidy autocomplete which adds ', ' to email
-                    $command_str .= ' ' . $this->quote(trim($v['filter-val']," \t,"));
+                    $command_str .= ' ' . $this->quote(trim($v['filter-val'], " \t,"));
                 } else if (!in_array($v['filter'], $this->rc->config->get('flag_criteria'))) {
                     $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
@@ -264,6 +266,7 @@
          * Here is where the actual query is fired to the imap server and the result is evaluated and sent back to the client side
          *
          * @access public
+         * @return null
          */
         function post_query()
         {
@@ -337,6 +340,7 @@
          * This adds a button into the message menu to use the advanced search
          *
          * @access public
+         * @return null
          */
         function mail_search_handler()
         {
@@ -359,6 +363,7 @@
          * This functions sends the initial data to the client side where a form (in dialog) is built for the advanced search
          *
          * @access public
+         * @return null
          */
         function prepare_filter()
         {
