@@ -51,6 +51,11 @@ folder for details on the skin license.
   This will give you a git-free copy of the stable branch.
 * Add advanced_search to $rcmail_config['plugins'] in your Roundcube config
 
+## Configuration
+
+* Available search criterias 
+* Targeted roundcube menu for the advanced search
+
 ## Credits
 
 * Wilwert Claude

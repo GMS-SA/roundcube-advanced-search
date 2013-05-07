@@ -22,76 +22,6 @@
          */
         private $rc;
         /**
-         * The menu where to place the advanced search button
-         *
-         * @var string
-         * @access private
-         */
-        private $target_menu = 'messagemenu';
-        /**
-         * Every criteria which takes a email as argument
-         *
-         * @var array
-         * @access private
-         */
-        private $email_criteria = array('HEADER FROM', 'HEADER TO', 'CC', 'BCC');
-        /**
-         * Every criteria which takes a date as argument
-         *
-         * @var array
-         * @access private
-         */
-        private $date_criteria = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
-        /**
-         * Every criteria which doesn't take an argument
-         *
-         * @var array
-         * @access private
-         */
-        private $flag_criteria = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'SEEN');
-        /**
-         * Prefered criteria to show on the top of lists
-         *
-         * @var array
-         * @access private
-         */
-        private $prefered_criteria = array('SUBJECT', 'BODY', 'HEADER FROM', 'HEADER TO', 'SENTSINCE', 'LARGER');
-        /**
-         * Other criteria, anything not in the above lists, except 'prefered_criteria'
-         *
-         * @var array
-         * @access private
-         */
-        private $other_criteria = array('SUBJECT', 'BODY', 'KEYWORD', 'LARGER', 'SMALLER');
-        /**
-         * All filter criteria
-         *
-         * @var array
-         * @access private
-         */
-        private $criteria = array(
-            'ANSWERED' => 'Answered',
-            'BCC' => 'Bcc',
-            'BEFORE' => 'Before',
-            'CC' => 'Cc',
-            'DELETED' => 'Deleted',
-            'DRAFT' => 'Draft',
-            'FLAGGED' => 'Flagged',
-            'KEYWORD' => 'Keyword',
-            'LARGER' => 'Larger Than',
-            'BODY' => 'Message Body',
-            'ON' => 'On',
-            'SEEN' => 'Read',
-            'SENTBEFORE' => 'Sent Before',
-            'HEADER FROM' => 'From',
-            'SENTON' => 'Sent On',
-            'SENTSINCE' => 'Sent Since',
-            'HEADER TO' => 'To',
-            'SINCE' => 'Since',
-            'SMALLER' => 'Smaller Than',
-            'SUBJECT' => 'Subject Contains'
-        );
-        /**
          * Localization strings
          *
          * @var array
@@ -109,6 +39,7 @@
         function init()
         {
             $this->rc = rcmail::get_instance();
+            $this->load_config();
             $this->register_action('plugin.prepare_filter', array($this, 'prepare_filter'));
             $this->register_action('plugin.post_query', array($this, 'post_query'));
             $this->skin = $this->rc->config->get('skin');
@@ -276,7 +207,7 @@
 
                 $command_str .= $v['filter'];
 
-                if (in_array($v['filter'], $this->date_criteria)) {
+                if (in_array($v['filter'], $this->rc->config->get('date_criteria'))) {
                     $date_format = $this->rc->config->get('date_format');
                     try {
                         $date = DateTime::createFromFormat($date_format, $v['filter-val']);
@@ -289,10 +220,10 @@
                         $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
                     }
 
-                } else if (in_array($v['filter'], $this->email_criteria)) {
+                } else if (in_array($v['filter'], $this->rc->config->get('email_criteria'))) {
                     // Tidy autocomplete which adds ', ' to email
                     $command_str .= ' ' . $this->quote(trim($v['filter-val']," \t,"));
-                } else if (!in_array($v['filter'], $this->flag_criteria)) {
+                } else if (!in_array($v['filter'], $this->rc->config->get('flag_criteria'))) {
                     $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
 
@@ -423,7 +354,7 @@
                     'innerclass' => 'icon advanced-search',
                     )
                 )
-            ), $this->target_menu);
+            ), $this->rc->config->get('target_menu'));
         }
         // }}}
         // {{{ prepare_filter()
@@ -443,12 +374,12 @@
 
             $ret = array('folders' => $folders,
                          'i18n_strings' => $this->i18n_strings,
-                         'criteria' => $this->criteria,
-                         'date_criteria' => $this->date_criteria,
-                         'flag_criteria' => $this->flag_criteria,
-                         'email_criteria' => $this->email_criteria,
-                         'prefered_criteria' => $this->prefered_criteria,
-                         'other_criteria' => $this->other_criteria);
+                         'criteria' => $this->rc->config->get('criteria'),
+                         'date_criteria' => $this->rc->config->get('date_criteria'),
+                         'flag_criteria' => $this->rc->config->get('flag_criteria'),
+                         'email_criteria' => $this->rc->config->get('email_criteria'),
+                         'prefered_criteria' => $this->rc->config->get('prefered_criteria'),
+                         'other_criteria' => $this->rc->config->get('other_criteria'));
 
             $this->rc->output->command('plugin.show', $ret);
         }
