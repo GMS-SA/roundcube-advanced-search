@@ -365,39 +365,135 @@
             $folders = $this->rc->get_storage()->list_folders_subscribed('', '*', null, null, true);
 
             if (!empty($folders)) {
-                $folders = $this->convert_folders($folders);
+                foreach($folders as $key => $folder) {
+                    $folders[$key] = $this->get_folder($folder);
+                }
             }
 
-            $ret = array('folders' => $folders,
-                         'i18n_strings' => $this->i18n_strings,
-                         'criteria' => $this->rc->config->get('criteria'),
+            $ret = array('html' => $this->render_html($folders, true),
+                         'row' => $this->render_html($folders, false),
+                         'title' => $this->i18n_strings['advsearch'],
                          'date_criteria' => $this->rc->config->get('date_criteria'),
                          'flag_criteria' => $this->rc->config->get('flag_criteria'),
-                         'email_criteria' => $this->rc->config->get('email_criteria'),
-                         'prefered_criteria' => $this->rc->config->get('prefered_criteria'),
-                         'other_criteria' => $this->rc->config->get('other_criteria'));
+                         'email_criteria' => $this->rc->config->get('email_criteria'));
 
             $this->rc->output->command('plugin.show', $ret);
         }
         // }}}
-        // {{{ convert_folder()
+        // {{{ render_html()
 
         /**
-         * This function loops all the folders and fires them throw a conversion function
+         * This function is used to render the html of the advanced search form and also
+         * the later following rows are created by this function
          *
-         * @param array $folders The array of folders to search in
+         * @param array $folders Array of folders
+         * @param boolean $first True if form gets created, False to create a new row
          * @access public
-         * @return An array ready to use for a <select></select> in javascript
+         * @return string The final html
          */
-        function convert_folders($folders)
+        function render_html($folders, $first)
         {
-            $return_value = array();
+            $html = '';
 
-            foreach($folders as $folder) {
-                $return_value[$folder] = $this->get_folder($folder);
+            if ($first) {
+                $options = '';
+                $attrs = array(
+                    'type' => 'submit',
+                    'name' => 'search',
+                    'class' => 'button mainaction',
+                    'value' => $this->i18n_strings['search'],
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td = html::tag('td', null, $input);
+                $options .= html::tag('option', array('value' => 'all'), $this->i18n_strings['allfolders']);
+
+                foreach($folders as $key => $folder) {
+                    $options .= html::tag('option', array('value' => $key), $folder);
+                }
+
+                $input = html::tag('input', array('type' => 'checkbox', 'name' => 'subfolder'), null);
+                $select = html::tag('select', array('name' => 'folder'), $options);
+                $span = html::tag('span', array('class' => 'sub-folders'), $this->i18n_strings['andsubfolders'] . ': ' . $input);
+                $td .= html::tag('td', null, $this->i18n_strings['in'] . ': ' . $select . $span . $this->i18n_strings['where'] . ': ');
+                $tr = html::tag('tr', null, $td);
+                $html .= html::tag('thead', null, $tr);
             }
 
-            return $return_value;
+            $optgroups = '';
+            $criteria = $this->rc->config->get('criteria');
+            $all_criteria = array(
+                'Common' => $this->rc->config->get('prefered_criteria'),
+                'Addresses' => $this->rc->config->get('email_criteria'),
+                'Dates' => $this->rc->config->get('date_criteria'),
+                'Flags' => $this->rc->config->get('flag_criteria'),
+                'Other' => $this->rc->config->get('other_criteria'),
+            );
+
+            foreach($all_criteria as $label => $specific_criteria) {
+                $options = '';
+
+                foreach($specific_criteria as $value) {
+                    $options .= html::tag('option', array('value' => $value), $criteria[$value]);
+                }
+
+                $optgroups .= html::tag('optgroup', array('label' => $label), $options);
+            }
+
+            $select = html::tag('select', array('name' => 'filter'), $optgroups);
+            $checkbox1 = html::tag('input', array('type' => 'checkbox', 'name' => 'not'), null);
+            $text = html::tag('input', array('type' => 'text', 'name' => 'filter-val'), null);
+            $checkbox2 = html::tag('input', array('type' => 'checkbox', 'name' => 'filter-exclude'), null);
+            $buttons = html::tag('button', array('name' => 'add', 'class' => 'add'), $this->i18n_strings['addfield']);;
+
+            if (!$first) {
+                $buttons .= html::tag('button', array('name' => 'delete', 'class' => 'delete'), $this->i18n_strings['delete']);
+            }
+
+            $content = $select . ' ' . $this->i18n_strings['not'] . $checkbox1 . $text;
+            $content .= ' ' . $this->i18n_strings['exclude'] . ':' . $checkbox2 . $buttons;
+            $td_content = html::tag('td', null, $content);
+            $tr = '';
+
+            if ($first) {
+                $td = html::tag('td', array('class' => 'adv-search-and-or'), null);
+                $tr = html::tag('tr', null, $td . $td_content);
+                $html .= html::tag('tbody', null, $tr);
+
+                $attrs = array(
+                    'type' => 'submit',
+                    'name' => 'search',
+                    'class' => 'button mainaction',
+                    'value' => $this->i18n_strings['search']
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td = html::tag('td', null, $input);
+
+                $attrs = array(
+                    'type' => 'reset',
+                    'name' => 'reset',
+                    'class' => 'button reset',
+                    'value' => $this->i18n_strings['resetsearch']
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td .= html::tag('td', null, $input);
+                $tr = html::tag('tr', null, $td);
+                $html .= html::tag('tfoot', null, $tr);
+
+                $html = html::tag('table', array('id' => 'adv-search'), $html);
+                $html = html::tag('form', array('method' => 'post', 'action' => '#'), $html);
+                $html = html::tag('div', array('id' => 'adsearch-popup'), $html);
+            } else {
+                $options = html::tag('option', array('value' => 'and'), $this->i18n_strings['and']);
+                $options .= html::tag('option', array('value' => 'or'), $this->i18n_strings['or']);
+                $select = html::tag('select', array('name' => 'method'), $options);
+                $td = html::tag('td', array('class' => 'adv-search-and-or'), $select);
+                $html = html::tag('tr', null, $td . $td_content);
+            }
+
+            return $html;
         }
         // }}}
         // {{{ get_folder()
