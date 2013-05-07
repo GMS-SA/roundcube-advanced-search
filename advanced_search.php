@@ -73,21 +73,17 @@
          */
         private function populate_i18n()
         {
-            // From Roundcube core localization
-            $this->i18n_strings['advsearch'] = $this->rc->gettext('advsearch');
-            $this->i18n_strings['search'] = $this->rc->gettext('search');
-            $this->i18n_strings['resetsearch'] = $this->rc->gettext('resetsearch');
-            $this->i18n_strings['addfield'] = $this->rc->gettext('addfield');
-            $this->i18n_strings['delete'] = $this->rc->gettext('delete');
-            // From plugin localization
-            $this->i18n_strings['in'] = $this->gettext('in');
-            $this->i18n_strings['and'] = $this->gettext('and');
-            $this->i18n_strings['or'] = $this->gettext('or');
-            $this->i18n_strings['not'] = $this->gettext('not');
-            $this->i18n_strings['where'] = $this->gettext('where');
-            $this->i18n_strings['exclude'] = $this->gettext('exclude');
-            $this->i18n_strings['andsubfolders'] = $this->gettext('andsubfolders');
-            $this->i18n_strings['allfolders'] = $this->gettext('allfolders');
+            $core = array('advsearch', 'search', 'resetsearch', 'addfield', 'delete');
+
+            foreach($core as $label) {
+                $this->i18n_strings[$label] = $this->rc->gettext($label);
+            }
+
+            $local = array('in', 'and', 'or', 'not', 'where', 'exclude', 'andsubfolders', 'allfolders');
+
+            foreach($local as $label) {
+                $this->i18n_strings[$label] = $this->gettext($label);
+            }
         }
         // }}}
         // {{{ format_input()
