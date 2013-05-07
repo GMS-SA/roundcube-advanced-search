@@ -2,7 +2,7 @@
     /**
      * Processing an advanced search over an E-Mail Account
      *
-     * @version 1.1.1
+     * @version 1.2.0
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -22,76 +22,6 @@
          */
         private $rc;
         /**
-         * The menu where to place the advanced search button
-         *
-         * @var string
-         * @access private
-         */
-        private $target_menu = 'messagemenu';
-        /**
-         * Every criteria which takes a email as argument
-         *
-         * @var array
-         * @access private
-         */
-        private $email_criteria = array('HEADER FROM', 'HEADER TO', 'CC', 'BCC');
-        /**
-         * Every criteria which takes a date as argument
-         *
-         * @var array
-         * @access private
-         */
-        private $date_criteria = array('BEFORE', 'ON', 'SINCE', 'SENTBEFORE', 'SENTON', 'SENTSINCE');
-        /**
-         * Every criteria which doesn't take an argument
-         *
-         * @var array
-         * @access private
-         */
-        private $flag_criteria = array('ANSWERED', 'DELETED', 'DRAFT', 'FLAGGED', 'SEEN');
-        /**
-         * Prefered criteria to show on the top of lists
-         *
-         * @var array
-         * @access private
-         */
-        private $prefered_criteria = array('SUBJECT', 'BODY', 'HEADER FROM', 'HEADER TO', 'SENTSINCE', 'LARGER');
-        /**
-         * Other criteria, anything not in the above lists, except 'prefered_criteria'
-         *
-         * @var array
-         * @access private
-         */
-        private $other_criteria = array('SUBJECT', 'BODY', 'KEYWORD', 'LARGER', 'SMALLER');
-        /**
-         * All filter criteria
-         *
-         * @var array
-         * @access private
-         */
-        private $criteria = array(
-            'ANSWERED' => 'Answered',
-            'BCC' => 'Bcc',
-            'BEFORE' => 'Before',
-            'CC' => 'Cc',
-            'DELETED' => 'Deleted',
-            'DRAFT' => 'Draft',
-            'FLAGGED' => 'Flagged',
-            'KEYWORD' => 'Keyword',
-            'LARGER' => 'Larger Than',
-            'BODY' => 'Message Body',
-            'ON' => 'On',
-            'SEEN' => 'Read',
-            'SENTBEFORE' => 'Sent Before',
-            'HEADER FROM' => 'From',
-            'SENTON' => 'Sent On',
-            'SENTSINCE' => 'Sent Since',
-            'HEADER TO' => 'To',
-            'SINCE' => 'Since',
-            'SMALLER' => 'Smaller Than',
-            'SUBJECT' => 'Subject Contains'
-        );
-        /**
          * Localization strings
          *
          * @var array
@@ -105,10 +35,12 @@
          * Initialisation of the plugin
          *
          * @access public
+         * @return null
          */
         function init()
         {
             $this->rc = rcmail::get_instance();
+            $this->load_config();
             $this->register_action('plugin.prepare_filter', array($this, 'prepare_filter'));
             $this->register_action('plugin.post_query', array($this, 'post_query'));
             $this->skin = $this->rc->config->get('skin');
@@ -139,24 +71,21 @@
          * The core localizations are not avalable directly in JS
          *
          * @access private
+         * @return null
          */
         private function populate_i18n()
         {
-            // From Roundcube core localization
-            $this->i18n_strings['advsearch'] = $this->rc->gettext('advsearch');
-            $this->i18n_strings['search'] = $this->rc->gettext('search');
-            $this->i18n_strings['resetsearch'] = $this->rc->gettext('resetsearch');
-            $this->i18n_strings['addfield'] = $this->rc->gettext('addfield');
-            $this->i18n_strings['delete'] = $this->rc->gettext('delete');
-            // From plugin localization
-            $this->i18n_strings['in'] = $this->gettext('in');
-            $this->i18n_strings['and'] = $this->gettext('and');
-            $this->i18n_strings['or'] = $this->gettext('or');
-            $this->i18n_strings['not'] = $this->gettext('not');
-            $this->i18n_strings['where'] = $this->gettext('where');
-            $this->i18n_strings['exclude'] = $this->gettext('exclude');
-            $this->i18n_strings['andsubfolders'] = $this->gettext('andsubfolders');
-            $this->i18n_strings['allfolders'] = $this->gettext('allfolders');
+            $core = array('advsearch', 'search', 'resetsearch', 'addfield', 'delete');
+
+            foreach($core as $label) {
+                $this->i18n_strings[$label] = $this->rc->gettext($label);
+            }
+
+            $local = array('in', 'and', 'or', 'not', 'where', 'exclude', 'andsubfolders', 'allfolders');
+
+            foreach($local as $label) {
+                $this->i18n_strings[$label] = $this->gettext($label);
+            }
         }
         // }}}
         // {{{ format_input()
@@ -211,12 +140,12 @@
                 $next_method = 'unknown';
 
                 // Lookup next method
-                if($k < $cnt-1) {
+                if ($k < $cnt-1) {
                     $next_method = $command_array[$k+1]['method'];
                 }
 
                 // If previous option was OR, close any open brakets
-                if($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
+                if ($paranthesis > 0 && $prev_method == 'or' && $v['method'] != 'or') {
                     for( ; $paranthesis > 0; $paranthesis--) {
                         $part .= ')';
                     }
@@ -225,11 +154,12 @@
                 // If there are two consecutive ORs, add brakets
                 // If the next option is a new OR, add the prefix here
                 // If the next option is _not_ a OR, and the current option is AND, prefix ALL
-                if($next_method == 'or') {
-                    if($v['method'] == 'or') {
+                if ($next_method == 'or') {
+                    if ($v['method'] == 'or') {
                         $part .= ' (';
                         $paranthesis++;
                     }
+                    
                     $part .= 'OR ';
                 } else if($v['method'] == 'and') {
                     $part .= 'ALL ';
@@ -276,23 +206,22 @@
 
                 $command_str .= $v['filter'];
 
-                if (in_array($v['filter'], $this->date_criteria)) {
+                if (in_array($v['filter'], $this->rc->config->get('date_criteria'))) {
                     $date_format = $this->rc->config->get('date_format');
+                    
                     try {
                         $date = DateTime::createFromFormat($date_format, $v['filter-val']);
                         $command_str .= ' ' . $this->quote(date_format($date, "d-M-Y"));
-                    }
-                    catch (Exception $e) {
+                    } catch (Exception $e) {
                         $date_format = preg_replace('/(\w)/','%$1', $date_format);
                         $date_array = strptime($v['filter-val'], $date_format);
                         $unix_ts = mktime($date_array['tm_hour'], $date_array['tm_min'], $date_array['tm_sec'], $date_array['tm_mon']+1, $date_array['tm_mday'], $date_array['tm_year']+1900);
                         $command_str .= ' ' . $this->quote(date("d-M-Y", $unix_ts));
                     }
-
-                } else if (in_array($v['filter'], $this->email_criteria)) {
+                } else if (in_array($v['filter'], $this->rc->config->get('email_criteria'))) {
                     // Tidy autocomplete which adds ', ' to email
-                    $command_str .= ' ' . $this->quote(trim($v['filter-val']," \t,"));
-                } else if (!in_array($v['filter'], $this->flag_criteria)) {
+                    $command_str .= ' ' . $this->quote(trim($v['filter-val'], " \t,"));
+                } else if (!in_array($v['filter'], $this->rc->config->get('flag_criteria'))) {
                     $command_str .= ' ' . $this->quote($v['filter-val']);
                 }
 
@@ -337,6 +266,7 @@
          * Here is where the actual query is fired to the imap server and the result is evaluated and sent back to the client side
          *
          * @access public
+         * @return null
          */
         function post_query()
         {
@@ -410,6 +340,7 @@
          * This adds a button into the message menu to use the advanced search
          *
          * @access public
+         * @return null
          */
         function mail_search_handler()
         {
@@ -423,7 +354,7 @@
                     'innerclass' => 'icon advanced-search',
                     )
                 )
-            ), $this->target_menu);
+            ), $this->rc->config->get('target_menu'));
         }
         // }}}
         // {{{ prepare_filter()
@@ -432,45 +363,142 @@
          * This functions sends the initial data to the client side where a form (in dialog) is built for the advanced search
          *
          * @access public
+         * @return null
          */
         function prepare_filter()
         {
             $folders = $this->rc->get_storage()->list_folders_subscribed('', '*', null, null, true);
 
             if (!empty($folders)) {
-                $folders = $this->convert_folders($folders);
+                foreach($folders as $key => $folder) {
+                    $folders[$key] = $this->get_folder($folder);
+                }
             }
 
-            $ret = array('folders' => $folders,
-                         'i18n_strings' => $this->i18n_strings,
-                         'criteria' => $this->criteria,
-                         'date_criteria' => $this->date_criteria,
-                         'flag_criteria' => $this->flag_criteria,
-                         'email_criteria' => $this->email_criteria,
-                         'prefered_criteria' => $this->prefered_criteria,
-                         'other_criteria' => $this->other_criteria);
+            $ret = array('html' => $this->render_html($folders, true),
+                         'row' => $this->render_html($folders, false),
+                         'title' => $this->i18n_strings['advsearch'],
+                         'date_criteria' => $this->rc->config->get('date_criteria'),
+                         'flag_criteria' => $this->rc->config->get('flag_criteria'),
+                         'email_criteria' => $this->rc->config->get('email_criteria'));
 
             $this->rc->output->command('plugin.show', $ret);
         }
         // }}}
-        // {{{ convert_folder()
+        // {{{ render_html()
 
         /**
-         * This function loops all the folders and fires them throw a conversion function
+         * This function is used to render the html of the advanced search form and also
+         * the later following rows are created by this function
          *
-         * @param array $folders The array of folders to search in
+         * @param array $folders Array of folders
+         * @param boolean $first True if form gets created, False to create a new row
          * @access public
-         * @return An array ready to use for a <select></select> in javascript
+         * @return string The final html
          */
-        function convert_folders($folders)
+        function render_html($folders, $first)
         {
-            $return_value = array();
+            $html = '';
 
-            foreach($folders as $folder) {
-                $return_value[$folder] = $this->get_folder($folder);
+            if ($first) {
+                $options = '';
+                $attrs = array(
+                    'type' => 'submit',
+                    'name' => 'search',
+                    'class' => 'button mainaction',
+                    'value' => $this->i18n_strings['search'],
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td = html::tag('td', null, $input);
+                $options .= html::tag('option', array('value' => 'all'), $this->i18n_strings['allfolders']);
+
+                foreach($folders as $key => $folder) {
+                    $options .= html::tag('option', array('value' => $key), $folder);
+                }
+
+                $input = html::tag('input', array('type' => 'checkbox', 'name' => 'subfolder'), null);
+                $select = html::tag('select', array('name' => 'folder'), $options);
+                $span = html::tag('span', array('class' => 'sub-folders'), $this->i18n_strings['andsubfolders'] . ': ' . $input);
+                $td .= html::tag('td', null, $this->i18n_strings['in'] . ': ' . $select . $span . $this->i18n_strings['where'] . ': ');
+                $tr = html::tag('tr', null, $td);
+                $html .= html::tag('thead', null, $tr);
             }
 
-            return $return_value;
+            $optgroups = '';
+            $criteria = $this->rc->config->get('criteria');
+            $all_criteria = array(
+                'Common' => $this->rc->config->get('prefered_criteria'),
+                'Addresses' => $this->rc->config->get('email_criteria'),
+                'Dates' => $this->rc->config->get('date_criteria'),
+                'Flags' => $this->rc->config->get('flag_criteria'),
+                'Other' => $this->rc->config->get('other_criteria'),
+            );
+
+            foreach($all_criteria as $label => $specific_criteria) {
+                $options = '';
+
+                foreach($specific_criteria as $value) {
+                    $options .= html::tag('option', array('value' => $value), $criteria[$value]);
+                }
+
+                $optgroups .= html::tag('optgroup', array('label' => $label), $options);
+            }
+
+            $select = html::tag('select', array('name' => 'filter'), $optgroups);
+            $checkbox1 = html::tag('input', array('type' => 'checkbox', 'name' => 'not'), null);
+            $text = html::tag('input', array('type' => 'text', 'name' => 'filter-val'), null);
+            $checkbox2 = html::tag('input', array('type' => 'checkbox', 'name' => 'filter-exclude'), null);
+            $buttons = html::tag('button', array('name' => 'add', 'class' => 'add'), $this->i18n_strings['addfield']);;
+
+            if (!$first) {
+                $buttons .= html::tag('button', array('name' => 'delete', 'class' => 'delete'), $this->i18n_strings['delete']);
+            }
+
+            $content = $select . ' ' . $this->i18n_strings['not'] . $checkbox1 . $text;
+            $content .= ' ' . $this->i18n_strings['exclude'] . ':' . $checkbox2 . $buttons;
+            $td_content = html::tag('td', null, $content);
+            $tr = '';
+
+            if ($first) {
+                $td = html::tag('td', array('class' => 'adv-search-and-or'), null);
+                $tr = html::tag('tr', null, $td . $td_content);
+                $html .= html::tag('tbody', null, $tr);
+
+                $attrs = array(
+                    'type' => 'submit',
+                    'name' => 'search',
+                    'class' => 'button mainaction',
+                    'value' => $this->i18n_strings['search']
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td = html::tag('td', null, $input);
+
+                $attrs = array(
+                    'type' => 'reset',
+                    'name' => 'reset',
+                    'class' => 'button reset',
+                    'value' => $this->i18n_strings['resetsearch']
+                );
+
+                $input = html::tag('input', $attrs, null);
+                $td .= html::tag('td', null, $input);
+                $tr = html::tag('tr', null, $td);
+                $html .= html::tag('tfoot', null, $tr);
+
+                $html = html::tag('table', array('id' => 'adv-search'), $html);
+                $html = html::tag('form', array('method' => 'post', 'action' => '#'), $html);
+                $html = html::tag('div', array('id' => 'adsearch-popup'), $html);
+            } else {
+                $options = html::tag('option', array('value' => 'and'), $this->i18n_strings['and']);
+                $options .= html::tag('option', array('value' => 'or'), $this->i18n_strings['or']);
+                $select = html::tag('select', array('name' => 'method'), $options);
+                $td = html::tag('td', array('class' => 'adv-search-and-or'), $select);
+                $html = html::tag('tr', null, $td . $td_content);
+            }
+
+            return $html;
         }
         // }}}
         // {{{ get_folder()

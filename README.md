@@ -2,6 +2,11 @@
 Advanced Search Plugin for Roundcube
 ====================================
 
+## Getting It
+
+You can download direct from GitHub or consider using
+the [plugin repository for Roundcube](http://plugins.roundcube.net/)
+
 ## Usage
 
 After install, 'Advanced search' will show up under the 'more' menu.
@@ -50,6 +55,13 @@ folder for details on the skin license.
 
   This will give you a git-free copy of the stable branch.
 * Add advanced_search to $rcmail_config['plugins'] in your Roundcube config
+
+* Finally, copy the config.inc.php.dist file to config.inc.php
+
+## Configuration
+
+* Available search criterias 
+* Targeted roundcube menu for the advanced search
 
 ## Credits
 

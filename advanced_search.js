@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 1.1.1
+     * @version 1.2.0
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -18,109 +18,12 @@
          * @name stack
          * @namespace
          */
-        folders: {},
-        i18n_strings: {},
-        criteria: {},
         date_criteria: {},
         flag_criteria: {},
         email_criteria: {},
-        prefered_criteria: {},
-        other_criteria: {},
+        row: null,
         messages: null
     };
-
-    /**
-     * This function generates a table dialog or a row for the table dialog, which is used to define the exact
-     * parameters for the advanced search query.
-     *
-     * @param {bool} first True -> Create entire dialog; False -> Create single row
-     */
-    function createCriteria(first) {
-        var html = [];
-        var current_criteria;
-
-        if (first) {
-            html.push('<div id="adsearch-popup">');
-            html.push('<form method="post" action="#">');
-            html.push('<table id="adv-search">');
-            html.push('<thead><tr><td>');
-
-            html.push('<input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td> <td> ' + $.stack.i18n_strings['in'] + ': <select name="folder">');
-            html.push('<option value="all">' + $.stack.i18n_strings['allfolders'] + '</option>');
-
-            for(var i in $.stack.folders) {
-                html.push('<option value="'+i+'">'+$.stack.folders[i]+'</option>');
-            }
-
-            html.push('</select>');
-            html.push('<span class="sub-folders"> ' + $.stack.i18n_strings['andsubfolders'] + ': <input type="checkbox" name="subfolder"> </span> ' + $.stack.i18n_strings['where'] + ': ');
-            html.push('</td></tr></thead>');
-            html.push('<tbody><tr><td class="adv-search-and-or"> </td><td>');
-        } else {
-            html.push('<tr><td class="adv-search-and-or"> ');
-            html.push('<select name="method"><option value="and">' + $.stack.i18n_strings['and'] + '</option><option value="or">' + $.stack.i18n_strings['or'] + '</option></select>');
-            html.push('</td><td>');
-        }
-
-        html.push('<select name="filter">');
-
-        html.push('<optgroup label="Common">');
-
-        for(var i in $.stack.prefered_criteria) {
-            current_criteria = $.stack.prefered_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Addresses">');
-
-        for(var i in $.stack.email_criteria) {
-            current_criteria = $.stack.email_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Dates">');
-
-        for(var i in $.stack.date_criteria) {
-            current_criteria = $.stack.date_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Flags">');
-
-        for(var i in $.stack.flag_criteria) {
-            current_criteria = $.stack.flag_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Other">');
-
-        for(var i in $.stack.other_criteria) {
-            current_criteria = $.stack.other_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('</optgroup></select>');
-        html.push(' ' + $.stack.i18n_strings['not'] + '<input type="checkbox" name="not" /><input type="text" name="filter-val" />');
-        html.push(' ' + $.stack.i18n_strings['exclude'] + ':<input type="checkbox" name="filter-exclude" />');
-        html.push('<button name="add" class="add">' + $.stack.i18n_strings['addfield'] + '</button>');
-
-        if (!first) {
-            html.push('<button name="delete" class="delete">' + $.stack.i18n_strings['delete'] + '</button>');
-        }
-
-        html.push('</td></tr>');
-
-        if (first) {
-            html.push('</tbody><tfoot><tr>');
-            html.push('<td><input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td>');
-            html.push('<td><input type="reset" name="reset" class="button reset" value="' + $.stack.i18n_strings['resetsearch'] + '" /></td>');
-            html.push('</tr></tfoot></table></form></div>');
-        }
-
-        html = html.join('');
-
-        return html;
-    }
 
     /**
      * The callback function of the initial dialog call. It creates the dialog and buffers the serverside
@@ -129,16 +32,12 @@
      * @param {object} r The serverside informations
      */
     rcmail.addEventListener('plugin.show', function(r) {
-        $.stack.folders = r.folders;
-        $.stack.i18n_strings = r.i18n_strings;
-        $.stack.criteria = r.criteria;
         $.stack.date_criteria = r.date_criteria;
         $.stack.flag_criteria = r.flag_criteria;
         $.stack.email_criteria = r.email_criteria;
-        $.stack.prefered_criteria = r.prefered_criteria;
-        $.stack.other_criteria = r.other_criteria;
+        $.stack.row = r.row;
 
-        var $html = $(createCriteria(true));
+        var $html = $(r.html);
 
         $('select[name=folder]', $html).val(rcmail.env.mailbox);
 
@@ -147,7 +46,7 @@
             height: 300,
             resizable: true,
             draggable: true,
-            title: $.stack.i18n_strings['advsearch'],
+            title: r.title,
             close: function() {
                 $(this).remove();
             }
@@ -204,6 +103,12 @@
                              sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
     });
 
+    /**
+     * The onclick event handler of the "reset search" button, which resets the advanced search
+     * back to its initial state.
+     *
+     * @param {object} e The event element
+     */
     $('input[name=reset]').live('click', function(e) {
         e.preventDefault();
 
@@ -224,7 +129,7 @@
     $('button[name=add]').live('click', function(e) {
         e.preventDefault();
 
-        $(this).closest('tr').after(createCriteria(false));
+        $(this).closest('tr').after($.stack.row);
     });
 
     /**
@@ -246,52 +151,54 @@
      * @param {object} e The event element
      */
     $('select[name=filter]').live('change', function(e) {
-        var row_input = $(this).nextUntil('tr','input[name=filter-val]');
-        var old_avs_type = row_input.data("avs_type");
+        var $row_input = $(this).nextUntil('tr', 'input[name=filter-val]'),
+            old_avs_type = $row_input.data("avs_type");
         
-        if( $.inArray($(this).val(), $.stack.date_criteria) >= 0 ) {
+        if ($.inArray($(this).val(), $.stack.date_criteria) >= 0) {
             if(old_avs_type !== "date") {
-                row_input.val('');
-                row_input.datepicker({dateFormat: rcmail.env.date_format});
+                $row_input.val('');
+                $row_input.datepicker({dateFormat: rcmail.env.date_format});
             }
-            row_input.data("avs_type","date");
-        }
-        else if( $.inArray($(this).val(), $.stack.email_criteria) >= 0 ) {
+
+            $row_input.data("avs_type", "date");
+        } else if ($.inArray($(this).val(), $.stack.email_criteria) >= 0) {
             if(old_avs_type !== "email") {
-                rcmail.init_address_input_events(row_input, "");
+                rcmail.init_address_input_events($row_input, "");
                 rcmail.addEventListener('autocomplete_insert', function(e){ 
                     e.field.value = e.insert.replace(/.*<(\S*?@\S*?)>.*/, "$1");
                 });
             }
-            row_input.data("avs_type","email");
-        }
-        else if( $.inArray($(this).val(), $.stack.flag_criteria) >= 0 ) {
-            if(old_avs_type !== "flag_criteria") {
-                row_input.val('');
-                row_input.hide();
+
+            $row_input.data("avs_type", "email");
+        } else if ($.inArray($(this).val(), $.stack.flag_criteria) >= 0) {
+            if (old_avs_type !== "flag_criteria") {
+                $row_input.val('');
+                $row_input.hide();
             }
-            row_input.data("avs_type","flag_criteria");
-        }
-        else {
-            row_input.data("avs_type","none");
+
+            $row_input.data("avs_type", "flag_criteria");
+        } else {
+            $row_input.data("avs_type", "none");
         }
 
         switch (old_avs_type) {
             case "date":
-                if( (row_input.data("avs_type") !== "date") && row_input.hasClass("hasDatepicker") )
-                    row_input.datepicker("destroy");
-                break;
-            case "email":
-                if( (row_input.data("avs_type") !== "email") ) {
-                    row_input.removeAttr("autocomplete");
-                    row_input.unbind('keydown');
-                    row_input.unbind('keypress');
+                if (($row_input.data("avs_type") !== "date") && $row_input.hasClass("hasDatepicker")) {
+                    $row_input.datepicker("destroy");
                 }
-                break;
+            break;
+            case "email":
+                if (($row_input.data("avs_type") !== "email")) {
+                    $row_input.removeAttr("autocomplete");
+                    $row_input.unbind('keydown');
+                    $row_input.unbind('keypress');
+                }
+            break;
             case "flag_criteria":
-                if( (row_input.data("avs_type") !== "flag_criteria") && !row_input.is(":visible") )
-                    row_input.show();
-                break;
+                if (($row_input.data("avs_type") !== "flag_criteria") && !$row_input.is(":visible")) {
+                    $row_input.show();
+                }
+            break;
         }
     });
 
