@@ -61,6 +61,22 @@
                     $this->mail_search_handler();
                 }
             }
+
+            $this->add_hook('startup', array($this, 'startup'));
+        }
+
+        function startup($input)
+        {
+            $search = get_input_value('_search', RCUBE_INPUT_GET);
+            if ($search == 'advanced_search_active') {
+                $action = get_input_value('_action', RCUBE_INPUT_GET);
+                $id = get_input_value('_uid', RCUBE_INPUT_GET);
+                if (($action == 'show' || $action == 'preview') && $id) {
+                    $uid = $_SESSION['advanced_search']['uid_list'][$id]['uid'];
+                    $mbox = $_SESSION['advanced_search']['uid_list'][$id]['mbox'];
+                    $this->rc->output->redirect(array('_task' => 'mail', '_action' => $action, '_mbox' => $mbox, '_uid' => $uid));
+                }
+            }
         }
         // }}}
         // {{{ populate_i18n()
@@ -273,27 +289,26 @@
             $search = get_input_value('search', RCUBE_INPUT_GET);
 
             if (!empty($search)) {
-                $mbox = get_input_value('folder', RCUBE_INPUT_GET) != 'all' ? get_input_value('folder', RCUBE_INPUT_GET) : null;
+                $mbox = get_input_value('folder', RCUBE_INPUT_GET) == 'all' ? 'all' : get_input_value('folder', RCUBE_INPUT_GET);
                 $imap_charset = RCMAIL_CHARSET;
                 $sort_column = rcmail_sort_column();
                 $search_str = $this->get_search_query($search);
                 $sub_folders = get_input_value('sub_folders', RCUBE_INPUT_GET) == 'true';
                 $folders = array();
                 $result_h = array();
+                $count = 0;
+                $new_id = 1;
+                $current_mbox = $this->rc->storage->get_folder();
+                $uid_list = array();
 
-                if ($sub_folders === false) {
-                    $folders[] = $mbox;
-                } else {
-                    $folders = $this->rc->get_storage()->list_folders_subscribed('', '*', null, null, true);
-
-                    if (!empty($folders)) {
-                        foreach($folders as $k => $v) {
-                            if (!preg_match('/^' . $mbox . '/', $v)) {
-                                unset($folders[$k]);
-                            }
+                $folders = $this->rc->get_storage()->list_folders_subscribed('', '*', null, null, true);
+                if (empty($folders) || ($sub_folders === false && $mbox !== 'all')) {
+                    $folders = array($mbox);
+                } else if ($mbox !== 'all') {
+                    foreach($folders as $k => $v) {
+                        if (!preg_match('/^' . $mbox . '/', $v)) {
+                            unset($folders[$k]);
                         }
-                    } else {
-                        $folders[] = $mbox;
                     }
                 }
 
@@ -303,16 +318,21 @@
                         $result_set = $this->rc->storage->list_messages($mbox, 1, $sort_column, rcmail_sort_order());
 
                         if (!empty($result_set)) {
-                            $result_h = array_merge($result_h, $result_set);
+                            foreach($result_set as $result) {
+                                $uid_list[$new_id] = array('uid' => $result->uid, 'mbox' => $mbox);
+                                $result->flags["skip_mbox_check"] = TRUE;
+                                $result->uid = $new_id;
+                                $result_h[] = $result;
+                                $new_id += 1;
+                            }
                         }
                     }
                 }
 
                 $count = count($result_h);
-
-                if (!empty($result_h)) {
+                if ($count > 0) {
+                    $_SESSION['advanced_search']['uid_list'] = $uid_list;
                     rcmail_js_message_list($result_h);
-
                     if ($search_str) {
                         $this->rc->output->show_message('searchsuccessful', 'confirmation', array('nr' => $count));
                     }
@@ -324,12 +344,12 @@
 
                 $current_folder = get_input_value('current_folder', RCUBE_INPUT_GET);
 
-                $this->rc->output->set_env('search_request', $search_str ? $search_request : '');
+                $this->rc->output->set_env('search_request', 'advanced_search_active');
                 $this->rc->output->set_env('messagecount', $count);
                 $this->rc->output->set_env('pagecount', ceil($count / $this->rc->storage->get_pagesize()));
                 $this->rc->output->set_env('exists', $this->rc->storage->count($current_folder, 'EXISTS'));
-                $this->rc->output->command('plugin.set_rowcount', rcmail_get_messagecount_text($count, 1), $current_folder);
                 $this->rc->output->command('set_rowcount', rcmail_get_messagecount_text($count, 1), $current_folder);
+                $this->rc->output->command('plugin.search_complete');
                 $this->rc->output->send();
             }
         }
@@ -413,8 +433,8 @@
                 $td = html::tag('td', null, $input);
                 $options .= html::tag('option', array('value' => 'all'), $this->i18n_strings['allfolders']);
 
-                foreach($folders as $key => $folder) {
-                    $options .= html::tag('option', array('value' => $key), $folder);
+                foreach($folders as $folder) {
+                    $options .= html::tag('option', null, $folder);
                 }
 
                 $input = html::tag('input', array('type' => 'checkbox', 'name' => 'subfolder'), null);

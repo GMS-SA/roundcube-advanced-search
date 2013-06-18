@@ -53,16 +53,16 @@
         });
     });
 
-    /**
-     * The callback function of an executed advanced search query. It cleanes up the old rows of the mail interface
-     * before they get replaced by the search results.
-     */
-    rcmail.addEventListener('plugin.set_rowcount', function() {
-        if ($.stack.messages !== null && $.stack.messages.length) {
-            $.stack.messages.each(function() {
-                $(this).remove();
-            });
-        }
+    rcmail.addEventListener('plugin.search_complete', function(r) {
+        rcmail.message_list.addEventListener('select', function(list){
+            if(list.selection.length == 1){
+                var message = rcmail.env.messages[list.selection[0]];
+                if(rcmail.env.advanced_search_uid_list[list.selection[0]]) {
+                    rcmail.select_folder(rcmail.env.advanced_search_uid_list[list.selection[0]].mbox, '', true);
+                    rcmail.env.mailbox = rcmail.env.advanced_search_uid_list[list.selection[0]].mbox;
+                }
+            }
+        });
     });
 
     /**
@@ -73,6 +73,8 @@
      */
     $('input[name=search]').live('click', function(e) {
         e.preventDefault();
+
+        rcmail.clear_message_list();
 
         var $form = $(this).closest('form'),
             $tr = $('tr', $('tbody', $form)),
