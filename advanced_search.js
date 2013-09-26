@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 1.2.0
+     * @version 1.3.0
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -36,13 +36,12 @@
         $.stack.flag_criteria = r.flag_criteria;
         $.stack.email_criteria = r.email_criteria;
         $.stack.row = r.row;
+        $.stack.html = r.html;
 
         var $html = $(r.html);
 
-        $('select[name=folder]', $html).val(rcmail.env.mailbox);
-
         $html.dialog({
-            width: 600,
+            width: 640,
             height: 300,
             resizable: true,
             draggable: true,
@@ -65,6 +64,12 @@
         });
     });
 
+    rcmail.addEventListener('plugin.avaddheader', function(evt) {
+        if($("#messagelist #rcavbox").length == 0) {
+            $("#messagelist tr:first").append('<td class="mbox" id="rcavbox"><span class="mbox">Mbox</span></td>');
+        }
+    });
+
     /**
      * The onclick event handler for the search button. This generates the search query and sends them
      * to the server. It also stores the wrapped set of the old rows into an object for later cleanup.
@@ -77,7 +82,7 @@
         rcmail.clear_message_list();
 
         var $form = $(this).closest('form'),
-            $tr = $('tr', $('tbody', $form)),
+            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
             data = [];
 
         if ($tr.length) {
@@ -113,14 +118,7 @@
      */
     $('input[name=reset]').live('click', function(e) {
         e.preventDefault();
-
-        var $form = $(this).closest('form');
-
-        $('tr:not(:first)', $('tbody', $form)).remove();
-        $('option:first', $('select', $form)).attr('selected', 'selected');
-        $('input[type=checkbox]:checked', $form).attr('checked', false);
-        $('input[type=text]', $form).val('');
-        $('select[name=folder]', $form).val(rcmail.env.mailbox);
+        $('#adsearch-popup').html($.stack.html);
     });
 
     /**
@@ -224,7 +222,7 @@
         e.preventDefault();
 
         if (!$('#adsearch-popup').length) {
-            rcmail.http_request('plugin.prepare_filter');
+            rcmail.http_request('plugin.display_advanced_search');
         }
     });
 

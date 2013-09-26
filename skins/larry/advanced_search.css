@@ -46,3 +46,11 @@ td.adv-search-and-or {
     padding-right: 10px;
     margin-right: 10px;
 }
+
+#rcavbox {
+    width: 30%;
+}
+
+td.avmbox {
+    /*    border: 1px solid red; */
+}
