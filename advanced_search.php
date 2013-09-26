@@ -155,6 +155,8 @@ class advanced_search extends rcube_plugin
                 $args['abort'] = true;
             }
 
+        } else {
+            $this->rc->output->command('plugin.advanced_search_del_header', array());
         }
     }
 

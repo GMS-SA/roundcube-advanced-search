@@ -83,6 +83,10 @@
         }
     });
 
+    rcmail.addEventListener('plugin.advanced_search_del_header', function(evt) {
+        $("#messagelist #rcavbox").remove();
+    });
+
     rcube_webmail.prototype.advanced_search_add_mbox = function (mbox, count, showMbox) {
         if (!this.gui_objects.messagelist || !this.message_list) {
             return false;
