@@ -13,5 +13,11 @@
 	],
 	"require": {
 		"roundcube/plugin-installer": ">=0.1.2"
-	}
+	},
+    "extra": {
+        "roundcube": {
+            "min-version": "0.9.4",
+            "max-version": "0.9.9999"
+        }
+    }
 }

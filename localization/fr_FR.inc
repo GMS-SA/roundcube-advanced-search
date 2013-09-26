@@ -8,4 +8,10 @@
     $labels['exclude'] = 'Exclure';
     $labels['andsubfolders'] = 'et sous-dossiers';
     $labels['allfolders'] = 'Tous les dossiers';
-
+    $labels['advancedsearch'] = 'Recherche avancée';
+    $labels['label_display_options'] = 'Options d\'affichage';
+    $labels['mailbox_headers_in_results'] = 'Afficher le nom du dossier en tant que ligne';
+    $labels['mailbox_info_in_results'] = 'Afficher le nom du dossier en tant que colonne';
+    $labels['display_in_messagemenu'] = 'dans le menu des messages';
+    $labels['display_in_toolbar'] = 'en tant que bouton dans la Toolbar';
+    $labels['show_advanced_search'] = 'Afficher la recherche avancée';
