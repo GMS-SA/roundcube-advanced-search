@@ -115,3 +115,21 @@ td.adv-search-and-or {
 #rcmrowadvancedsearch.selected td.section {
     background-position: 6px -1674px !important;
 }
+
+p.avsearchpref span {
+    min-width: 280px;
+    display: block;
+    max-width: 280px;
+    float: left;
+    vertical-align: middle;
+}
+
+p.avsearchpref img {
+    border-radius: 10px;
+}
+
+p.avsearchpref img.disabled {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+}

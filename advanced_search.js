@@ -25,6 +25,26 @@
         messages: null
     };
 
+    $("#button_display_option").live('change', function(e) {
+        var img = $('img', $(this).closest('p'));
+        var src = img.attr('src');
+        if(this.value == 'messagemenu') {
+            src = src.replace('menu_location_b.jpg', 'menu_location_a.jpg');
+        } else {
+            src = src.replace('menu_location_a.jpg', 'menu_location_b.jpg');
+        }
+        img.attr('src', src);
+    });
+
+    $("#_show_message_mbox_info, #_show_message_label_header").live('change', function(e) {
+        var img = $('img', $(this).closest('p'));
+        if($(this).is(':checked')) {
+            img.removeClass('disabled');
+        } else {
+            img.addClass('disabled');
+        }
+    });
+
     /**
      * The callback function of the initial dialog call. It creates the dialog and buffers the serverside
      * informations into an object.

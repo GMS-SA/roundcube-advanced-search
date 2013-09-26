@@ -894,19 +894,30 @@ class advanced_search extends rcube_plugin
             $label1 = html::label('_show_message_label_header', Q($this->gettext('mailbox_headers_in_results')));
             $label2 = html::label('_show_message_mbox_info', Q($this->gettext('mailbox_info_in_results')));
             $label3 = html::label('button_display_option', Q($this->gettext('show_advanced_search')));
+
             $arg1 = array('name' => '_show_message_label_header', 'id' => '_show_message_label_header', 'type' => 'checkbox', 'title' => "", 'class' => 'watermark linput', 'value' => 1);
             if (isset($displayOptions['_show_message_label_header']) && $displayOptions['_show_message_label_header'] === true) {
                 $arg1['checked'] = 'checked';
+                $img1class = 'enabled';
+            } else {
+                $img1class = 'disabled';            
             }
             $check1 = html::tag('input', $arg1);
             $arg2 = array('name' => '_show_message_mbox_info', 'id' => '_show_message_mbox_info', 'type' => 'checkbox', 'title' => "", 'class' => 'watermark linput', 'value' => 1);
             if (isset($displayOptions['_show_message_mbox_info']) && $displayOptions['_show_message_mbox_info'] === true) {
                 $arg2['checked'] = 'checked';
+                $img2class = 'enabled';
+            } else {
+                $img2class = 'disabled';
             }
+
+            $img1 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_row.jpg'), 'class' => $img1class));
+            $img2 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_col.jpg'), 'class' => $img2class));
+
             $check2 = html::tag('input', $arg2);
-            $args['blocks']['label_display_options']['options'][0] = array('title' => '', 'content' => '<p>' . $check1 . ' ' . $label1 . '</p>');
-            $args['blocks']['label_display_options']['options'][1] = array('title' => '', 'content' => '<p>' . $check2 . ' ' . $label2 . '</p>');
-            $args['blocks']['label_display_options']['options'][2] = array('title' => '', 'content' => '<p>' . $label3 . ' ' . $select . '</p>');
+            $args['blocks']['label_display_options']['options'][0] = array('title' => '', 'content' => '<p class="avsearchpref"><span>' . $check1 . ' ' . $label1 . '</span> ' . $img1 . '</p>');
+            $args['blocks']['label_display_options']['options'][1] = array('title' => '', 'content' => '<p class="avsearchpref"><span>' . $check2 . ' ' . $label2 . '</span> ' . $img2 . '</p>');
+            $args['blocks']['label_display_options']['options'][2] = array('title' => '', 'content' => '<p class="avsearchpref"><span>' . $label3 . ' ' . $select . '</span> ' . $img3 . '</p>');
         }
 
         return($args);
