@@ -12,8 +12,6 @@
 
 class advanced_search extends rcube_plugin
 {
-    // {{{ class vars
-
     /**
      * Instance of rcmail
      *
@@ -28,8 +26,6 @@ class advanced_search extends rcube_plugin
      * @access private
      */
     private $i18n_strings = array();
-    // }}}
-    // {{{ init()
 
     /**
      * Initialisation of the plugin
@@ -78,8 +74,6 @@ class advanced_search extends rcube_plugin
             }
         }
     }
-    // }}}
-    // {{{ populate_i18n()
 
     /**
      * This function populates an array with localization texts.
@@ -103,8 +97,6 @@ class advanced_search extends rcube_plugin
             $this->i18n_strings[$label] = $this->gettext($label);
         }
     }
-    // }}}
-    // {{{ format_input()
 
     /**
      * This function formats some incoming criteria (by javascript) into IMAP compatible criteria
@@ -133,8 +125,6 @@ class advanced_search extends rcube_plugin
 
         return $return_data;
     }
-    // }}}
-    // {{{ finalise_command()
 
     /**
      * This function converts the preconfigured query parts (as array) into an IMAP compatible string
@@ -198,8 +188,6 @@ class advanced_search extends rcube_plugin
 
         return $command;
     }
-    // }}}
-    // {{{ get_search_query()
 
     /**
      * This function generates the IMAP compatible search query based on the request data (by javascript)
@@ -249,8 +237,6 @@ class advanced_search extends rcube_plugin
 
         return $command;
     }
-    // }}}
-    // {{{ quote()
 
     /**
      * This function quotes some specific values based on their data type
@@ -275,8 +261,6 @@ class advanced_search extends rcube_plugin
 
         return $value;
     }
-    // }}}
-    // {{{ post_query()
 
     /**
      * Here is where the actual query is fired to the imap server and the result is evaluated and sent back to the client side
@@ -353,8 +337,6 @@ class advanced_search extends rcube_plugin
             $this->rc->output->send();
         }
     }
-    // }}}
-    // {{{ mail_search_handler()
 
     /**
      * This adds a button into the message menu to use the advanced search
@@ -376,8 +358,6 @@ class advanced_search extends rcube_plugin
             )
         ), $this->rc->config->get('target_menu'));
     }
-    // }}}
-    // {{{ prepare_filter()
 
     /**
      * This functions sends the initial data to the client side where a form (in dialog) is built for the advanced search
@@ -404,8 +384,6 @@ class advanced_search extends rcube_plugin
 
         $this->rc->output->command('plugin.show', $ret);
     }
-    // }}}
-    // {{{ render_html()
 
     /**
      * This function is used to render the html of the advanced search form and also
@@ -520,8 +498,6 @@ class advanced_search extends rcube_plugin
 
         return $html;
     }
-    // }}}
-    // {{{ get_folder()
 
     /**
      * This function creates an array with the IMAP foldername as key and only the real (sub)folder name as value 
@@ -548,6 +524,5 @@ class advanced_search extends rcube_plugin
 
         return $breakers . $folder[count($folder)-1];
     }
-    // }}}
 }
 ?>
