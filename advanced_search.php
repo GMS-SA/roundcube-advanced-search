@@ -502,7 +502,7 @@ class advanced_search extends rcube_plugin
         if ($first) {
             $row_html = $tmp;
         } else {
-            $and_or_select = new html_select();
+            $and_or_select = new html_select(array('name' => 'method'));
             $and_or_select->add($this->i18n_strings['and'], 'and');
             $and_or_select->add($this->i18n_strings['or'], 'or');
             $tmp .= html::tag('button', array('name' => 'delete', 'class' => 'delete'), $this->i18n_strings['delete']);
