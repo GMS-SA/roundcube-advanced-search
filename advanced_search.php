@@ -884,11 +884,13 @@ class advanced_search extends rcube_plugin
             $optarg = array('value' => 'messagemenu');
             if ($target_menu == 'messagemenu') {
                 $optarg['selected'] = 'selected';
+                $target_image = 'menu_location_a.jpg';
             }
             $options .= html::tag('option', $optarg, Q($this->gettext('display_in_messagemenu')));
             $optarg = array('value' => 'toolbar');
             if ($target_menu == 'toolbar') {
                 $optarg['selected'] = 'selected';
+                $target_image = 'menu_location_b.jpg';
             }
             $options .= html::tag('option', $optarg, Q($this->gettext('display_in_toolbar')));
             $select = html::tag('select', array('name' => 'button_display_option', 'id' => 'button_display_option'), $options);
@@ -915,6 +917,7 @@ class advanced_search extends rcube_plugin
 
             $img1 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_row.jpg'), 'class' => $img1class));
             $img2 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_col.jpg'), 'class' => $img2class));
+            $img3 = html::img(array('src' => $this->url('skins/larry/images/' . $target_image)));
 
             $check2 = html::tag('input', $arg2);
             $args['blocks']['label_display_options']['options'][0] = array('title' => '', 'content' => '<p class="avsearchpref"><span>' . $check1 . ' ' . $label1 . '</span> ' . $img1 . '</p>');
