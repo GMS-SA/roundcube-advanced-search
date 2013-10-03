@@ -951,9 +951,6 @@ class advanced_search extends rcube_plugin
         $count = 0;
         $folder_count = array();
         foreach ($folders_search as $mbox) {
-            if ($mbox == $this->rc->config->get('trash_mbox')) {
-                continue;
-            }
             $this->rc->storage->set_folder($mbox);
             $this->rc->storage->search($mbox, $search_string, RCMAIL_CHARSET, $_SESSION['sort_col']);
             $result = array();
