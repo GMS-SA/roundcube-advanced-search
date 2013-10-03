@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.0.0
+     * @version 2.1.0
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -59,22 +59,79 @@
         $.stack.html = r.html;
 
         var $html = $(r.html);
-
+        $("[name=delete]", $html).hide();
+        var saved_searches = '<span class="saved_searches"> Saved searches: <select name="select_saved_search"><option value=""></option></select></span>';
+        title = $('<div>' + r.title + saved_searches + '<div>');
+        if (r.saved_searches.length) {
+            var i;
+            var saved_searches_select = $('[name=select_saved_search]', title);
+            for (i in r.saved_searches) {
+                saved_searches_select.append('<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>');
+            }
+        }
         $html.dialog({
             width: 640,
             height: 300,
             resizable: true,
             draggable: true,
-            title: r.title,
+            title: title,
             dialogClass: "advanced_search_dialog",
             close: function() {
-                $(this).remove();
                 $('body').css('overflow', 'auto');
             },
             create: function() {
                 $('body').css('overflow', 'hidden');
             }
         });
+
+        saved_searches_select.hover(
+            function(){
+                $html.dialog('option', 'draggable', false);
+            },
+            function(){
+                $html.dialog('option', 'draggable', true);
+            }
+        );
+
+        saved_searches_select.bind('change', function(e) {
+            var search_name = $(this).val();
+            if (search_name == "") {
+                $('#adsearch-popup').html($.stack.html);
+                $('[name=delete]', '#adsearch-popup').hide();
+            } else {
+                rcmail.http_request('plugin.get_saved_search', { search_name : search_name });
+                $('[name=delete]', '#adsearch-popup').show();
+            }
+        });
+
+    });
+
+    rcmail.addEventListener('plugin.load_saved_search', function(search) {
+        var $form = $("#adsearch-popup form"),
+            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
+            $last = $('tr:last', $('tbody', $form));
+            saved_search = search.search,
+            data = [];
+        $tr.remove();
+        $("[name=folder]", $form).val(search.folder);
+        $("[name=subfolder]", $form).prop('checked', search.sub_folders == "true");
+        $('span.sub-folders', $form).css('display', search.folder == 'all' ? 'none' : 'inline');
+
+        var i = 0;
+        for (i; i < saved_search.length; i++) {
+            var row;
+            if (i == 0) {
+                row = $('<tr>' + $("tr:eq(1)", $.stack.html).html() + '</tr>');
+            } else {
+                row = $($.stack.row);
+            }
+            $("[name=method]", row).val(saved_search[i].method);
+            $("[name=filter]", row).val(saved_search[i].filter);
+            $("[name=not]", row).prop('checked', saved_search[i]['not'] == "true");
+            $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
+            $("[name=filter-exclude]", row).prop('checked', saved_search[i]['excluded'] == "true");
+            $last.before(row);
+        }
     });
 
     rcmail.addEventListener('plugin.advanced_search_add_header', function(evt) {
@@ -102,6 +159,33 @@
     }
 
     /**
+     * Builds the search to send to the server
+     */
+    var get_search_data = function()
+    {
+        var $form = $("#adsearch-popup form"),
+            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
+            data = [];
+
+        if ($tr.length) {
+            $tr.each(function() {
+                    var item = {not: $('input[name=not]', $(this)).attr('checked') == 'checked',
+                                excluded: $('input[name=filter-exclude]', $(this)).attr('checked') == 'checked',
+                                filter: $('option:selected', $('select[name=filter]', $(this))).val(),
+                                'filter-val': $('input[name=filter-val]', $(this)).val()};
+
+                    if ($('select[name=method]', $(this)).length) {
+                        item.method = $('option:selected', $('select[name=method]', $(this))).val();
+                    }
+
+                    data.push(item);
+            });
+        }
+
+        return data;
+    }
+
+    /**
      * The onclick event handler for the search button. This generates the search query and sends them
      * to the server. It also stores the wrapped set of the old rows into an object for later cleanup.
      *
@@ -112,35 +196,16 @@
 
         rcmail.clear_message_list();
 
-        var $form = $(this).closest('form'),
-            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
-            data = [];
-
-        if ($tr.length) {
-            $tr.each(function() {
-                if ($('input[name=filter-exclude]', $(this)).attr('checked') != 'checked') {
-                    var item = {not: $('input[name=not]', $(this)).attr('checked') == 'checked',
-                                filter: $('option:selected', $('select[name=filter]', $(this))).val(),
-                                'filter-val': $('input[name=filter-val]', $(this)).val()};
-
-                    if ($('select[name=method]', $(this)).length) {
-                        item.method = $('option:selected', $('select[name=method]', $(this))).val();
-                    }
-
-                    data.push(item);
-                }
-            });
-        }
-
         $.stack.messages = $('tr', $('tbody', '#messagelist'));
 
+        var $form = $("#adsearch-popup form");
         rcmail.http_request('plugin.trigger_search',
-                            {search: data,
+                            {search: get_search_data(),
                              current_folder: rcmail.env.mailbox,
                              folder: $('select[name=folder]', $form).val(),
                              sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
 
-        $(".ui-dialog-titlebar-close", ".advanced_search_dialog").trigger("click");
+        $("#adsearch-popup").closest('div.ui-dialog-content').dialog('close');
     });
 
     /**
@@ -256,6 +321,8 @@
 
         if (!$('#adsearch-popup').length) {
             rcmail.http_request('plugin.display_advanced_search');
+        } else {
+            $("#adsearch-popup").closest('div.ui-dialog-content').dialog('open');
         }
     });
 
@@ -267,6 +334,89 @@
      */
     $("#adsearch-popup").live('keydown keypress', function(e) {
         e.stopPropagation();
+    });
+
+    $("#adsearch-popup input.delete_search").live('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var search_name = $("[name=select_saved_search]").val();
+        var txt = {};
+        txt['cancel'] = rcmail.get_label('advanced_search.cancel');
+        txt['delete'] = rcmail.get_label('advanced_search.delete');
+        $( "<p><strong>" + search_name + "</strong></p>" ).dialog({
+            resizable: true,
+            height:180,
+            modal: true,
+            title: rcmail.gettext('advanced_search.deletesearch'),
+            buttons: [
+                {
+                    text: txt['delete'],
+                    click: function() {
+                        rcmail.http_request('plugin.delete_search', {search_name: search_name});
+                        $("[value=REMOte]", "[name=select_saved_search]").remove();
+                        $("[name=select_saved_search]").val("").trigger("change");
+                        $( this ).dialog( "close" );
+                    },
+                },
+                {
+                    text: txt['cancel'],
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }]
+
+        });
+    });
+
+    $("#save_the_search").live('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var save_search = '<table>'
+                        + '  <tr><td>Name:</td><td><input type="text" name="search_name" /></td></tr>'
+                        + '  <tr><td></td><td><input type="submit" class="button mainaction" value="Save" /> <input type="reset" class="button reset" value="Cancel" /></td></tr>'
+                        + '</table>';
+        save_search = $(save_search);
+        $("[name=search_name]", save_search).val($("[name=select_saved_search]").val());
+
+        save_search.dialog({
+                    title: rcmail.gettext('advanced_search.save_the_search'),
+                    dialogClass: 'saveTheSearch',
+                    close: function() {
+                        $(this).remove();
+                    },
+                    width: $("#adsearch-popup").width(),
+                    height: $("#adsearch-popup").height(),
+                    modal: true
+                  });
+       $(".mainaction", save_search).bind('click', function(e) {
+           e.preventDefault();
+           e.stopPropagation();
+           var search_name = $("[name=search_name]", save_search).val();
+           var $form = $("#adsearch-popup form");
+           rcmail.http_request('plugin.save_search',
+                            {search: get_search_data(),
+                             search_name: search_name,
+                             folder: $('select[name=folder]', $form).val(),
+                             sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
+           var isNewSearch = true;
+           $("[name=select_saved_search] option").each(function(e) {
+               if ($(this).attr("value") == search_name) {
+                   isNewSearch = false;
+               }
+           });
+           if (isNewSearch) {
+               $("[name=select_saved_search]").append('<option value="' + search_name + '">' + search_name + '</option>');
+               $("[name=select_saved_search]").val(search_name);
+           }
+           save_search.dialog('close');
+       });
+
+       $(".reset", save_search).bind('click', function(e) {
+           e.preventDefault();
+           e.stopPropagation();
+           save_search.dialog('close');
+       });
+
     });
 
     var advanced_search_redirect_draft_messages = function(check) {

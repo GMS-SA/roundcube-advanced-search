@@ -2,7 +2,7 @@
 /**
  * Processing an advanced search over an E-Mail Account
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @licence GNU GPLv3+
  * @author  Wilwert Claude
  * @author  Ludovicy Steve
@@ -54,6 +54,9 @@ class advanced_search extends rcube_plugin
         $this->register_action('plugin.display_advanced_search', array($this, 'display_advanced_search'));
         $this->register_action('plugin.trigger_search', array($this, 'trigger_search'));
         $this->register_action('plugin.trigger_search_pagination', array($this, 'trigger_search_pagination'));
+        $this->register_action('plugin.save_search', array($this, 'save_search'));
+        $this->register_action('plugin.delete_search', array($this, 'delete_search'));
+        $this->register_action('plugin.get_saved_search', array($this, 'get_saved_search'));
 
         $this->skin = $this->rc->config->get('skin');
         $this->add_texts('localization', true);
@@ -156,7 +159,9 @@ class advanced_search extends rcube_plugin
             }
 
         } else {
-            $this->rc->output->command('plugin.advanced_search_del_header', array());
+            if ($args['action'] != 'plugin.get_saved_search' && $args['action'] != 'plugin.save_search' && $args['action'] != 'plugin.delete_search') {
+                $this->rc->output->command('plugin.advanced_search_del_header', array());
+            }
         }
     }
 
@@ -170,13 +175,13 @@ class advanced_search extends rcube_plugin
      */
     private function populate_i18n()
     {
-        $core = array('advsearch', 'search', 'resetsearch', 'addfield', 'delete');
+        $core = array('advsearch', 'search', 'resetsearch', 'addfield', 'delete', 'cancel');
 
         foreach ($core as $label) {
             $this->i18n_strings[$label] = $this->rc->gettext($label);
         }
 
-        $local = array('in', 'and', 'or', 'not', 'where', 'exclude', 'andsubfolders', 'allfolders');
+        $local = array('in', 'and', 'or', 'not', 'where', 'exclude', 'andsubfolders', 'allfolders', 'save_the_search', 'has_been_saved', 'deletesearch', 'has_been_deleted');
 
         foreach ($local as $label) {
             $this->i18n_strings[$label] = $this->gettext($label);
@@ -321,6 +326,10 @@ class advanced_search extends rcube_plugin
         $command = array();
 
         foreach ($input as $search_part) {
+            // Skip excluded parts
+            if ($search_part['excluded'] == 'true') {
+                continue;
+            }
             if (! $part_command = $this->process_search_part($search_part)) {
                 return 0;
             }
@@ -410,6 +419,7 @@ class advanced_search extends rcube_plugin
     {
         $ret = array('html' => $this->generate_searchbox(),
                      'row' => $this->add_row(),
+                     'saved_searches' => $this->get_saved_search_names(),
                      'title' => $this->i18n_strings['advsearch'],
                      'date_criteria' => $this->config['date_criteria'],
                      'flag_criteria' => $this->config['flag_criteria'],
@@ -422,6 +432,8 @@ class advanced_search extends rcube_plugin
     {
         $search_button = new html_inputfield(array('type' => 'submit', 'name' => 'search', 'class' => 'button mainaction', 'value' => $this->i18n_strings['search']));
         $reset_button = new html_inputfield(array('type' => 'reset', 'name' => 'reset', 'class' => 'button reset', 'value' => $this->i18n_strings['resetsearch']));
+        $save_button = html::tag('input', array('type' => 'submit', 'name' => 'save_the_search', id=> 'save_the_search', 'class' => 'button save_search', 'value' => $this->i18n_strings['save_the_search']));
+        $delete_button = new html_inputfield(array('type' => 'submit', 'name' => 'delete', 'class' => 'button delete_search', 'value' => $this->i18n_strings['deletesearch']));
 
         $layout_table = new html_table();
         $layout_table->add(null, $search_button->show());
@@ -447,7 +459,7 @@ class advanced_search extends rcube_plugin
         $layout_table->add(null, $first_row);
         $layout_table->add_row();
         $layout_table->add(null, $search_button->show());
-        $layout_table->add(null, $reset_button->show());
+        $layout_table->add(null, $save_button . ' ' . $reset_button->show() . ' ' . $delete_button->show());
 
         return html::tag(
             'div',
@@ -1008,5 +1020,62 @@ class advanced_search extends rcube_plugin
         $uid_mboxes = $this->rcmail_js_message_list($messages, false, null, $showAvmbox, $avbox, $showMboxColumn);
 
         return $uid_mboxes;
+    }
+
+    public function save_search()
+    {
+        $search_name = get_input_value('search_name', RCUBE_INPUT_GPC);
+        if ($search_name) {
+            $search = array();
+            $search['search'] = get_input_value('search', RCUBE_INPUT_GPC);
+            $search['search_name'] = $search_name;
+            $search['folder'] = get_input_value('folder', RCUBE_INPUT_GPC);
+            $search['sub_folders'] = get_input_value('sub_folders', RCUBE_INPUT_GPC);
+            $prefs = (array)$this->rc->user->get_prefs();
+            if (!isset($prefs['advanced_search'])) {
+                $prefs['advanced_search'] = array();
+            }
+            $prefs['advanced_search'][$search_name] = $search;
+            $this->rc->user->save_prefs(array('advanced_search' => $prefs['advanced_search']));
+            $this->rc->output->show_message('"<i>' . $search_name . '</i>" ' . $this->i18n_strings['has_been_saved'], 'confirmation');
+        }
+    }
+
+    public function delete_search()
+    {
+        $search_name = get_input_value('search_name', RCUBE_INPUT_GPC);
+        if ($search_name) {
+            $prefs = (array)$this->rc->user->get_prefs();
+            unset($prefs['advanced_search'][$search_name]);
+            $this->rc->user->save_prefs(array('advanced_search' => $prefs['advanced_search']));
+            $this->rc->output->show_message('"<i>' . $search_name . '</i>" ' . $this->i18n_strings['has_been_deleted'], 'notice');
+        }
+    }
+
+    public function get_saved_search()
+    {
+        $search_name = get_input_value('search_name', RCUBE_INPUT_GPC);
+        $prefs = (array)$this->rc->user->get_prefs();
+        if (!isset($prefs['advanced_search'])) {
+            $prefs['advanced_search'] = array();
+        }
+
+        $search = isset($prefs['advanced_search'][$search_name]) ? $prefs['advanced_search'][$search_name] : false;
+        $this->rc->output->command('plugin.load_saved_search', $search);
+        $this->rc->output->send();
+    }
+
+    private function get_saved_search_names()
+    {
+        $prefs = (array)$this->rc->user->get_prefs();
+        if (!isset($prefs['advanced_search'])) {
+            $prefs['advanced_search'] = array();
+        }
+        $names = array();
+        foreach($prefs['advanced_search'] as $name => $search) {
+            $names[] = $name;
+        }
+
+        return $names;
     }
 }

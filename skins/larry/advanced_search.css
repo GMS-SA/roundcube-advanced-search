@@ -133,3 +133,86 @@ p.avsearchpref img.disabled {
     -moz-filter: grayscale(100%);
     filter: grayscale(100%);
 }
+
+button.save_search {
+    color: #ffffff;
+    background-color: #2f96b4;
+    border-radius: 4px;
+    height: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 10px;
+}
+
+input.save_search {
+    padding: 0 10px 0 10px;
+    height: 20px;
+    background: #20b8fb;
+    border: none;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: none;
+    background: #6193DF;
+    background: -moz-linear-gradient(top, #6193DF 0%, #2B84C0 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6193DF), color-stop(100%,#2B84C0));
+    background: -o-linear-gradient(top, #6193DF 0%, #2B84C0 100%);
+    background: -ms-linear-gradient(top, #6193DF 0%, #2B84C0 100%);
+    background: linear-gradient(top, #6193DF 0%, #2B84C0 100%);
+}
+
+input.save_search:active {
+    background: #81C0EB;
+    background: -moz-linear-gradient(top, #6193DF 0%, #81C0EB 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6193DF), color-stop(100%,#81C0EB));
+    background: -o-linear-gradient(top, #6193DF 0%, #81C0EB 100%);
+    background: -ms-linear-gradient(top, #6193DF 0%, #81C0EB 100%);
+    background: linear-gradient(top, #6193DF 0%, #81C0EB 100%);
+}
+
+input.delete_search {
+    padding: 0 10px 0 10px;
+    height: 19px;
+    background: #20b8fb;
+    border: none;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: none;
+    background: #85190A;
+    background: -moz-linear-gradient(top, #85190A 0%, #CA361A 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#85190A), color-stop(100%,#CA361A));
+    background: -o-linear-gradient(top, #85190A 0%, #CA361A 100%);
+    background: -ms-linear-gradient(top, #85190A 0%, #CA361A 100%);
+    background: linear-gradient(top, #85190A 0%, #CA361A 100%);
+}
+
+input.delete_search:active {
+    background: #85190A;
+    background: -moz-linear-gradient(top, #85190A 0%, #F09F98 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#85190A), color-stop(100%,#F09F98));
+    background: -o-linear-gradient(top, #85190A 0%, #F09F98 100%);
+    background: -ms-linear-gradient(top, #85190A 0%, #F09F98 100%);
+    background: linear-gradient(top, #85190A 0%, #F09F98 100%);
+}
+
+
+.advanced_search_dialog .ui-dialog-title {
+    width: 100%;
+}
+
+.advanced_search_dialog .ui-dialog-title span.saved_searches {
+    border: 1px solid lightgray;
+    float: right;
+    display: block;
+    padding-right: 10px;
+    -moz-box-shadow: inset 0 0 5px #888;
+    -webkit-box-shadow: inset 0 0 5px#888;
+    box-shadow: inner 0 0 5px #888;
+    padding-left: 10px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+    border-radius: 4px;
+}
+
+#adsearch-popup input[name="filter-val"] {
+    margin-right: 4px;
+}

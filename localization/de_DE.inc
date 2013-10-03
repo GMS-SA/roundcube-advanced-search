@@ -15,3 +15,8 @@
     $labels['display_in_messagemenu'] = 'im Nachrichtenmenü anzeigen';
     $labels['display_in_toolbar'] = 'als Button in der Toolbar anzeigen';
     $labels['show_advanced_search'] = 'Erweiterte Suche';
+    $labels['save_the_search'] = 'Diese Suche speichern';
+    $labels['has_been_saved'] = 'wurde gespeichert';
+    $labels['has_been_deleted'] = 'wurde gelöscht';
+    $labels['cancel'] = 'Abbrechen';
+    $labels['delete'] = 'Löschen';
