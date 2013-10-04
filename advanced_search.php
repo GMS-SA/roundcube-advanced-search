@@ -61,7 +61,7 @@ class advanced_search extends rcube_plugin
         $this->skin = $this->rc->config->get('skin');
         $this->add_texts('localization', true);
         $this->populate_i18n();
-        $this->include_script('advanced_search.js');
+        $this->include_script('advanced_search.min.js');
 
         if ($this->rc->task == 'mail') {
             $file = 'skins/' . $this->skin . '/advanced_search.css';
