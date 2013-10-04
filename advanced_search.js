@@ -126,9 +126,10 @@
             $("[name=method]", row).val(saved_search[i].method);
             $("[name=filter]", row).val(saved_search[i].filter);
             $("[name=not]", row).prop('checked', saved_search[i]['not'] == "true");
-            $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
             $("[name=filter-exclude]", row).prop('checked', saved_search[i]['excluded'] == "true");
             $last.before(row);
+            $("[name=filter]", row).trigger("change");
+            $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
         }
     });
 
