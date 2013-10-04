@@ -433,7 +433,7 @@ class advanced_search extends rcube_plugin
         $search_button = new html_inputfield(array('type' => 'submit', 'name' => 'search', 'class' => 'button mainaction', 'value' => $this->i18n_strings['search']));
         $reset_button = new html_inputfield(array('type' => 'reset', 'name' => 'reset', 'class' => 'button reset', 'value' => $this->i18n_strings['resetsearch']));
         $save_button = html::tag('input', array('type' => 'submit', 'name' => 'save_the_search', id=> 'save_the_search', 'class' => 'button save_search', 'value' => $this->i18n_strings['save_the_search']));
-        $delete_button = new html_inputfield(array('type' => 'submit', 'name' => 'delete', 'class' => 'button delete_search', 'value' => $this->i18n_strings['deletesearch']));
+        $delete_button = new html_inputfield(array('type' => 'submit', 'name' => 'delete', 'style' => 'display: none;', 'class' => 'button delete_search', 'value' => $this->i18n_strings['deletesearch']));
 
         $layout_table = new html_table();
         $layout_table->add(null, $search_button->show());

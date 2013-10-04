@@ -59,7 +59,6 @@
         $.stack.html = r.html;
 
         var $html = $(r.html);
-        $("[name=delete]", $html).hide();
         var saved_searches = '<span class="saved_searches"> Saved searches: <select name="select_saved_search"><option value=""></option></select></span>';
         title = $('<div>' + r.title + saved_searches + '<div>');
         if (r.saved_searches.length) {
@@ -97,7 +96,6 @@
             var search_name = $(this).val();
             if (search_name == "") {
                 $('#adsearch-popup').html($.stack.html);
-                $('[name=delete]', '#adsearch-popup').hide();
             } else {
                 rcmail.http_request('plugin.get_saved_search', { search_name : search_name });
                 $('[name=delete]', '#adsearch-popup').show();
@@ -217,6 +215,7 @@
     $('input[name=reset]').live('click', function(e) {
         e.preventDefault();
         $('#adsearch-popup').html($.stack.html);
+        $('[name=select_saved_search]').val("");
     });
 
     /**
