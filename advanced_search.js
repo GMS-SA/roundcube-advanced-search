@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 1.1.1
+     * @version 2.1.0
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -18,109 +18,32 @@
          * @name stack
          * @namespace
          */
-        folders: {},
-        i18n_strings: {},
-        criteria: {},
         date_criteria: {},
         flag_criteria: {},
         email_criteria: {},
-        prefered_criteria: {},
-        other_criteria: {},
+        row: null,
         messages: null
     };
 
-    /**
-     * This function generates a table dialog or a row for the table dialog, which is used to define the exact
-     * parameters for the advanced search query.
-     *
-     * @param {bool} first True -> Create entire dialog; False -> Create single row
-     */
-    function createCriteria(first) {
-        var html = [];
-        var current_criteria;
-
-        if (first) {
-            html.push('<div id="adsearch-popup">');
-            html.push('<form method="post" action="#">');
-            html.push('<table id="adv-search">');
-            html.push('<thead><tr><td>');
-
-            html.push('<input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td> <td> ' + $.stack.i18n_strings['in'] + ': <select name="folder">');
-            html.push('<option value="all">' + $.stack.i18n_strings['allfolders'] + '</option>');
-
-            for(var i in $.stack.folders) {
-                html.push('<option value="'+i+'">'+$.stack.folders[i]+'</option>');
-            }
-
-            html.push('</select>');
-            html.push('<span class="sub-folders"> ' + $.stack.i18n_strings['andsubfolders'] + ': <input type="checkbox" name="subfolder"> </span> ' + $.stack.i18n_strings['where'] + ': ');
-            html.push('</td></tr></thead>');
-            html.push('<tbody><tr><td class="adv-search-and-or"> </td><td>');
+    $("#button_display_option").live('change', function(e) {
+        var img = $('img', $(this).closest('p'));
+        var src = img.attr('src');
+        if(this.value == 'messagemenu') {
+            src = src.replace('menu_location_b.jpg', 'menu_location_a.jpg');
         } else {
-            html.push('<tr><td class="adv-search-and-or"> ');
-            html.push('<select name="method"><option value="and">' + $.stack.i18n_strings['and'] + '</option><option value="or">' + $.stack.i18n_strings['or'] + '</option></select>');
-            html.push('</td><td>');
+            src = src.replace('menu_location_a.jpg', 'menu_location_b.jpg');
         }
+        img.attr('src', src);
+    });
 
-        html.push('<select name="filter">');
-
-        html.push('<optgroup label="Common">');
-
-        for(var i in $.stack.prefered_criteria) {
-            current_criteria = $.stack.prefered_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
+    $("#_show_message_mbox_info, #_show_message_label_header").live('change', function(e) {
+        var img = $('img', $(this).closest('p'));
+        if($(this).is(':checked')) {
+            img.removeClass('disabled');
+        } else {
+            img.addClass('disabled');
         }
-
-        html.push('<optgroup label="Addresses">');
-
-        for(var i in $.stack.email_criteria) {
-            current_criteria = $.stack.email_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Dates">');
-
-        for(var i in $.stack.date_criteria) {
-            current_criteria = $.stack.date_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Flags">');
-
-        for(var i in $.stack.flag_criteria) {
-            current_criteria = $.stack.flag_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('<optgroup label="Other">');
-
-        for(var i in $.stack.other_criteria) {
-            current_criteria = $.stack.other_criteria[i];
-            html.push('<option value="'+current_criteria+'">'+$.stack.criteria[current_criteria]+'</option>');
-        }
-
-        html.push('</optgroup></select>');
-        html.push(' ' + $.stack.i18n_strings['not'] + '<input type="checkbox" name="not" /><input type="text" name="filter-val" />');
-        html.push(' ' + $.stack.i18n_strings['exclude'] + ':<input type="checkbox" name="filter-exclude" />');
-        html.push('<button name="add" class="add">' + $.stack.i18n_strings['addfield'] + '</button>');
-
-        if (!first) {
-            html.push('<button name="delete" class="delete">' + $.stack.i18n_strings['delete'] + '</button>');
-        }
-
-        html.push('</td></tr>');
-
-        if (first) {
-            html.push('</tbody><tfoot><tr>');
-            html.push('<td><input type="submit" name="search" class="button mainaction" value="' + $.stack.i18n_strings['search'] + '" /></td>');
-            html.push('<td><input type="reset" name="reset" class="button reset" value="' + $.stack.i18n_strings['resetsearch'] + '" /></td>');
-            html.push('</tr></tfoot></table></form></div>');
-        }
-
-        html = html.join('');
-
-        return html;
-    }
+    });
 
     /**
      * The callback function of the initial dialog call. It creates the dialog and buffers the serverside
@@ -129,42 +52,137 @@
      * @param {object} r The serverside informations
      */
     rcmail.addEventListener('plugin.show', function(r) {
-        $.stack.folders = r.folders;
-        $.stack.i18n_strings = r.i18n_strings;
-        $.stack.criteria = r.criteria;
         $.stack.date_criteria = r.date_criteria;
         $.stack.flag_criteria = r.flag_criteria;
         $.stack.email_criteria = r.email_criteria;
-        $.stack.prefered_criteria = r.prefered_criteria;
-        $.stack.other_criteria = r.other_criteria;
+        $.stack.row = r.row;
+        $.stack.html = r.html;
 
-        var $html = $(createCriteria(true));
-
-        $('select[name=folder]', $html).val(rcmail.env.mailbox);
-
+        var $html = $(r.html);
+        var saved_searches = '<span class="saved_searches"> Saved searches: <select name="select_saved_search"><option value=""></option></select></span>';
+        title = $('<div>' + r.title + saved_searches + '<div>');
+        if (r.saved_searches.length) {
+            var i;
+            var saved_searches_select = $('[name=select_saved_search]', title);
+            for (i in r.saved_searches) {
+                saved_searches_select.append('<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>');
+            }
+        }
         $html.dialog({
-            width: 600,
+            width: 640,
             height: 300,
             resizable: true,
             draggable: true,
-            title: $.stack.i18n_strings['advsearch'],
+            title: title,
+            dialogClass: "advanced_search_dialog",
             close: function() {
-                $(this).remove();
+                $('body').css('overflow', 'auto');
+            },
+            create: function() {
+                $('body').css('overflow', 'hidden');
             }
         });
+
+        saved_searches_select.hover(
+            function(){
+                $html.dialog('option', 'draggable', false);
+            },
+            function(){
+                $html.dialog('option', 'draggable', true);
+            }
+        );
+
+        saved_searches_select.bind('change', function(e) {
+            var search_name = $(this).val();
+            if (search_name == "") {
+                $('#adsearch-popup').html($.stack.html);
+            } else {
+                rcmail.http_request('plugin.get_saved_search', { search_name : search_name });
+                $('[name=delete]', '#adsearch-popup').show();
+            }
+        });
+
     });
 
-    /**
-     * The callback function of an executed advanced search query. It cleanes up the old rows of the mail interface
-     * before they get replaced by the search results.
-     */
-    rcmail.addEventListener('plugin.set_rowcount', function() {
-        if ($.stack.messages !== null && $.stack.messages.length) {
-            $.stack.messages.each(function() {
-                $(this).remove();
-            });
+    rcmail.addEventListener('plugin.load_saved_search', function(search) {
+        var $form = $("#adsearch-popup form"),
+            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
+            $last = $('tr:last', $('tbody', $form));
+            saved_search = search.search,
+            data = [];
+        $tr.remove();
+        $("[name=folder]", $form).val(search.folder);
+        $("[name=subfolder]", $form).prop('checked', search.sub_folders == "true");
+        $('span.sub-folders', $form).css('display', search.folder == 'all' ? 'none' : 'inline');
+
+        var i = 0;
+        for (i; i < saved_search.length; i++) {
+            var row;
+            if (i == 0) {
+                row = $('<tr>' + $("tr:eq(1)", $.stack.html).html() + '</tr>');
+            } else {
+                row = $($.stack.row);
+            }
+            $("[name=method]", row).val(saved_search[i].method);
+            $("[name=filter]", row).val(saved_search[i].filter);
+            $("[name=not]", row).prop('checked', saved_search[i]['not'] == "true");
+            $("[name=filter-exclude]", row).prop('checked', saved_search[i]['excluded'] == "true");
+            $last.before(row);
+            $("[name=filter]", row).trigger("change");
+            $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
         }
     });
+
+    rcmail.addEventListener('plugin.advanced_search_add_header', function(evt) {
+        if($("#messagelist #rcavbox").length == 0) {
+            $("#messagelist tr:first").append('<td class="mbox" id="rcavbox"><span class="mbox">Mbox</span></td>');
+        }
+    });
+
+    rcmail.addEventListener('plugin.advanced_search_del_header', function(evt) {
+        $("#messagelist #rcavbox").remove();
+    });
+
+    rcube_webmail.prototype.advanced_search_add_mbox = function (mbox, count, showMbox) {
+        if (!this.gui_objects.messagelist || !this.message_list) {
+            return false;
+        }
+
+        var colspan = showMbox == true ? 9 : 8;
+        $(rcmail.message_list.list).append('<tr class="aslabel_mbox"><td><span class="aslabel_found">' + count + '</span></td><td colspan="' + colspan + '">' + mbox + '</td></tr>');
+    }
+
+    rcube_webmail.prototype.advanced_search_active = function(param) {
+        var page = param.replace('_page=', '');
+        rcmail.http_request('plugin.trigger_search_pagination', { _page : page });
+    }
+
+    /**
+     * Builds the search to send to the server
+     */
+    var get_search_data = function()
+    {
+        var $form = $("#adsearch-popup form"),
+            $tr = $('tr', $('tbody', $form)).not(':first').not(':last'),
+            data = [];
+
+        if ($tr.length) {
+            $tr.each(function() {
+                    var item = {not: $('input[name=not]', $(this)).attr('checked') == 'checked',
+                                excluded: $('input[name=filter-exclude]', $(this)).attr('checked') == 'checked',
+                                filter: $('option:selected', $('select[name=filter]', $(this))).val(),
+                                'filter-val': $('input[name=filter-val]', $(this)).val()};
+
+                    if ($('select[name=method]', $(this)).length) {
+                        item.method = $('option:selected', $('select[name=method]', $(this))).val();
+                    }
+
+                    data.push(item);
+            });
+        }
+
+        return data;
+    }
 
     /**
      * The onclick event handler for the search button. This generates the search query and sends them
@@ -175,45 +193,30 @@
     $('input[name=search]').live('click', function(e) {
         e.preventDefault();
 
-        var $form = $(this).closest('form'),
-            $tr = $('tr', $('tbody', $form)),
-            data = [];
-
-        if ($tr.length) {
-            $tr.each(function() {
-                if ($('input[name=filter-exclude]', $(this)).attr('checked') != 'checked') {
-                    var item = {not: $('input[name=not]', $(this)).attr('checked') == 'checked',
-                                filter: $('option:selected', $('select[name=filter]', $(this))).val(),
-                                'filter-val': $('input[name=filter-val]', $(this)).val()};
-
-                    if ($('select[name=method]', $(this)).length) {
-                        item.method = $('option:selected', $('select[name=method]', $(this))).val();
-                    }
-
-                    data.push(item);
-                }
-            });
-        }
+        rcmail.clear_message_list();
 
         $.stack.messages = $('tr', $('tbody', '#messagelist'));
 
-        rcmail.http_request('plugin.post_query',
-                            {search: data,
+        var $form = $("#adsearch-popup form");
+        rcmail.http_request('plugin.trigger_search',
+                            {search: get_search_data(),
                              current_folder: rcmail.env.mailbox,
                              folder: $('select[name=folder]', $form).val(),
                              sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
+
+        $("#adsearch-popup").closest('div.ui-dialog-content').dialog('close');
     });
 
+    /**
+     * The onclick event handler of the "reset search" button, which resets the advanced search
+     * back to its initial state.
+     *
+     * @param {object} e The event element
+     */
     $('input[name=reset]').live('click', function(e) {
         e.preventDefault();
-
-        var $form = $(this).closest('form');
-
-        $('tr:not(:first)', $('tbody', $form)).remove();
-        $('option:first', $('select', $form)).attr('selected', 'selected');
-        $('input[type=checkbox]:checked', $form).attr('checked', false);
-        $('input[type=text]', $form).val('');
-        $('select[name=folder]', $form).val(rcmail.env.mailbox);
+        $('#adsearch-popup').html($.stack.html);
+        $('[name=select_saved_search]').val("");
     });
 
     /**
@@ -224,7 +227,7 @@
     $('button[name=add]').live('click', function(e) {
         e.preventDefault();
 
-        $(this).closest('tr').after(createCriteria(false));
+        $(this).closest('tr').after($.stack.row);
     });
 
     /**
@@ -246,52 +249,54 @@
      * @param {object} e The event element
      */
     $('select[name=filter]').live('change', function(e) {
-        var row_input = $(this).nextUntil('tr','input[name=filter-val]');
-        var old_avs_type = row_input.data("avs_type");
-        
-        if( $.inArray($(this).val(), $.stack.date_criteria) >= 0 ) {
+        var $row_input = $(this).nextUntil('tr', 'input[name=filter-val]'),
+            old_avs_type = $row_input.data("avs_type");
+
+        if ($.inArray($(this).val(), $.stack.date_criteria) >= 0) {
             if(old_avs_type !== "date") {
-                row_input.val('');
-                row_input.datepicker({dateFormat: rcmail.env.date_format});
+                $row_input.val('');
+                $row_input.datepicker({dateFormat: rcmail.env.date_format});
             }
-            row_input.data("avs_type","date");
-        }
-        else if( $.inArray($(this).val(), $.stack.email_criteria) >= 0 ) {
+
+            $row_input.data("avs_type", "date");
+        } else if ($.inArray($(this).val(), $.stack.email_criteria) >= 0) {
             if(old_avs_type !== "email") {
-                rcmail.init_address_input_events(row_input, "");
-                rcmail.addEventListener('autocomplete_insert', function(e){ 
+                rcmail.init_address_input_events($row_input, "");
+                rcmail.addEventListener('autocomplete_insert', function(e){
                     e.field.value = e.insert.replace(/.*<(\S*?@\S*?)>.*/, "$1");
                 });
             }
-            row_input.data("avs_type","email");
-        }
-        else if( $.inArray($(this).val(), $.stack.flag_criteria) >= 0 ) {
-            if(old_avs_type !== "flag_criteria") {
-                row_input.val('');
-                row_input.hide();
+
+            $row_input.data("avs_type", "email");
+        } else if ($.inArray($(this).val(), $.stack.flag_criteria) >= 0) {
+            if (old_avs_type !== "flag_criteria") {
+                $row_input.val('');
+                $row_input.hide();
             }
-            row_input.data("avs_type","flag_criteria");
-        }
-        else {
-            row_input.data("avs_type","none");
+
+            $row_input.data("avs_type", "flag_criteria");
+        } else {
+            $row_input.data("avs_type", "none");
         }
 
         switch (old_avs_type) {
             case "date":
-                if( (row_input.data("avs_type") !== "date") && row_input.hasClass("hasDatepicker") )
-                    row_input.datepicker("destroy");
-                break;
-            case "email":
-                if( (row_input.data("avs_type") !== "email") ) {
-                    row_input.removeAttr("autocomplete");
-                    row_input.unbind('keydown');
-                    row_input.unbind('keypress');
+                if (($row_input.data("avs_type") !== "date") && $row_input.hasClass("hasDatepicker")) {
+                    $row_input.datepicker("destroy");
                 }
-                break;
+            break;
+            case "email":
+                if (($row_input.data("avs_type") !== "email")) {
+                    $row_input.removeAttr("autocomplete");
+                    $row_input.unbind('keydown');
+                    $row_input.unbind('keypress');
+                }
+            break;
             case "flag_criteria":
-                if( (row_input.data("avs_type") !== "flag_criteria") && !row_input.is(":visible") )
-                    row_input.show();
-                break;
+                if (($row_input.data("avs_type") !== "flag_criteria") && !$row_input.is(":visible")) {
+                    $row_input.show();
+                }
+            break;
         }
     });
 
@@ -311,11 +316,13 @@
      *
      * @param {object} e The event element
      */
-    $('a.icon.advanced-search').live('click', function(e) {
+    $('a.icon.advanced-search, a.button.advanced-search').live('click', function(e) {
         e.preventDefault();
 
         if (!$('#adsearch-popup').length) {
-            rcmail.http_request('plugin.prepare_filter');
+            rcmail.http_request('plugin.display_advanced_search');
+        } else {
+            $("#adsearch-popup").closest('div.ui-dialog-content').dialog('open');
         }
     });
 
@@ -329,11 +336,381 @@
         e.stopPropagation();
     });
 
+    $("#adsearch-popup input.delete_search").live('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var search_name = $("[name=select_saved_search]").val();
+        var txt = {};
+        txt['cancel'] = rcmail.get_label('advanced_search.cancel');
+        txt['delete'] = rcmail.get_label('advanced_search.delete');
+        $( "<p><strong>" + search_name + "</strong></p>" ).dialog({
+            resizable: true,
+            height:180,
+            modal: true,
+            title: rcmail.gettext('advanced_search.deletesearch'),
+            buttons: [
+                {
+                    text: txt['delete'],
+                    click: function() {
+                        rcmail.http_request('plugin.delete_search', {search_name: search_name});
+                        $("[value=REMOte]", "[name=select_saved_search]").remove();
+                        $("[name=select_saved_search]").val("").trigger("change");
+                        $( this ).dialog( "close" );
+                    },
+                },
+                {
+                    text: txt['cancel'],
+                    click: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }]
+
+        });
+    });
+
+    $("#save_the_search").live('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var save_search = '<table>'
+                        + '  <tr><td>Name:</td><td><input type="text" name="search_name" /></td></tr>'
+                        + '  <tr><td></td><td><input type="submit" class="button mainaction" value="Save" /> <input type="reset" class="button reset" value="Cancel" /></td></tr>'
+                        + '</table>';
+        save_search = $(save_search);
+        $("[name=search_name]", save_search).val($("[name=select_saved_search]").val());
+
+        save_search.dialog({
+                    title: rcmail.gettext('advanced_search.save_the_search'),
+                    dialogClass: 'saveTheSearch',
+                    close: function() {
+                        $(this).remove();
+                    },
+                    width: $("#adsearch-popup").width(),
+                    height: $("#adsearch-popup").height(),
+                    modal: true
+                  });
+       $(".mainaction", save_search).bind('click', function(e) {
+           e.preventDefault();
+           e.stopPropagation();
+           var search_name = $("[name=search_name]", save_search).val();
+           var $form = $("#adsearch-popup form");
+           rcmail.http_request('plugin.save_search',
+                            {search: get_search_data(),
+                             search_name: search_name,
+                             folder: $('select[name=folder]', $form).val(),
+                             sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
+           var isNewSearch = true;
+           $("[name=select_saved_search] option").each(function(e) {
+               if ($(this).attr("value") == search_name) {
+                   isNewSearch = false;
+               }
+           });
+           if (isNewSearch) {
+               $("[name=select_saved_search]").append('<option value="' + search_name + '">' + search_name + '</option>');
+               $("[name=select_saved_search]").val(search_name);
+           }
+           save_search.dialog('close');
+       });
+
+       $(".reset", save_search).bind('click', function(e) {
+           e.preventDefault();
+           e.stopPropagation();
+           save_search.dialog('close');
+       });
+
+    });
+
+    var advanced_search_redirect_draft_messages = function(check) {
+        if (rcmail.env.search_request == "advanced_search_active") {
+            if (rcmail.task == 'mail') {
+                uid = rcmail.get_single_uid();
+                if (uid && (!rcmail.env.uid || uid != rcmail.env.uid || check)) {
+                    if ((rcmail.env.mailbox == rcmail.env.drafts_mailbox) || check) {
+                        url = {
+                            _mbox: this.env.mailbox,
+                            _search: 'advanced_search_active'
+                        };
+                        url[this.env.mailbox == this.env.drafts_mailbox ? '_draft_uid' : '_uid'] = uid;
+                        this.goto_url('compose', url, true);
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    var advanced_search_perform_action = function(props, action) {
+
+        var raw_selection = rcmail.message_list.get_selection();
+        var md5_folders = rcmail.env.as_md5_folders;
+        var i;
+        var selections = {};
+        for (i in raw_selection) {
+            raw_selection[i];
+            var parts = raw_selection[i].split('__MB__');
+            var mid = parts[0];
+            var md5Mbox = parts[1];
+            var mbox = md5_folders[md5Mbox];
+            if (!selections[mbox]) {
+                selections[mbox] = [];
+            }
+            selections[mbox].push(mid);
+        }
+
+        if (i != undefined) {
+            // show wait message
+            if (rcmail.env.action == 'show') {
+                lock = rcmail.set_busy(true, 'movingmessage');
+            } else {
+                rcmail.show_contentframe(false);
+            }
+            // Hide message command buttons until a message is selected
+            rcmail.enable_command(rcmail.env.message_commands, false);
+            var j;
+            for (j in selections) {
+                rcmail.select_folder(j, '', true);
+                rcmail.env.mailbox = j;
+                var uids = selections[j].join(',');
+                var lock = false,
+                    post_data = rcmail.selection_post_data({
+                        _target_mbox: props.id,
+                        _uid: uids
+                    });
+                rcmail._with_selected_messages(action, post_data, lock);
+            }
+            // Make sure we have no selection
+            rcmail.env.uid = undefined;
+            rcmail.message_list.selection = [];
+        }
+
+    }
+
+    var advanced_search_check_multi_mbox = function () {
+        var raw_selection = rcmail.message_list.get_selection();
+        var md5_folders = rcmail.env.as_md5_folders;
+        var i;
+        var mcount = 0;
+        var selections = {};
+        for (i in raw_selection) {
+            raw_selection[i];
+            var parts = raw_selection[i].split('__MB__');
+            var mid = parts[0];
+            var md5Mbox = parts[1];
+            var mbox = md5_folders[md5Mbox];
+            if (!selections[mbox]) {
+                selections[mbox] = [];
+                mcount++;
+            }
+            selections[mbox].push(mid);
+        }
+
+        return {
+            isMulti: mcount > 1,
+            selections: selections
+        };
+    }
+
     /**
-     * The roundcube init funtion, which registers and enables the advanced search command. 
+     * The roundcube init funtion, which registers and enables the advanced search command.
      */
     rcmail.addEventListener('init', function() {
         rcmail.register_command('plugin.advanced_search', true, true);
         rcmail.enable_command('plugin.advanced_search', true);
+
+        rcmail.addEventListener('plugin.search_complete', function(r) {
+            /* Start registering event listeners for handling drag/drop, marking, flagging etc... */
+            rcmail.addEventListener('beforeedit', function (command) {
+                rcmail.env.framed = true;
+                if (advanced_search_redirect_draft_messages(true)) {
+                    return false;
+                }
+            });
+
+            rcmail.message_list.addEventListener('dblclick', function (o) {
+                advanced_search_redirect_draft_messages();
+            });
+
+            rcmail.message_list.addEventListener('select', function (list) {
+                if (rcmail.env.search_request == "advanced_search_active") {
+                    if (list.selection.length == 1) {
+                        var parts = list.selection[0].split('__MB__');
+                        var mid = parts[0];
+                        var md5Mbox = parts[1];
+                        var mbox = rcmail.env.as_md5_folders[md5Mbox];
+                        rcmail.env.uid = mid;
+                        if (rcmail.env.mailbox != mbox) {
+                            var ex = [];
+                            li = rcmail.get_folder_li(mbox, '', true);
+                            parent = $(li).parents(".mailbox");
+                            parent.each(function () {
+                                div = $(this.getElementsByTagName('div')[0]);
+                                a = $(this.getElementsByTagName('a')[0]);
+                                if (div.hasClass('collapsed')) {
+                                    ex.push($(a).attr("rel"));
+                                }
+                            });
+                            for (var i = ex.length - 1; i >= 0; i--) {
+                                rcmail.command('collapse-folder', ex[i]);
+                            }
+                            rcmail.select_folder(mbox, '', true);
+                            rcmail.env.mailbox = mbox;
+                        }
+                        return false;
+                    }
+                }
+            });
+
+            rcmail.addEventListener('beforemoveto', function (props) {
+                if (rcmail.env.search_request == 'advanced_search_active') {
+                    advanced_search_perform_action(props, 'moveto');
+
+                    return false;
+                }
+            });
+
+            rcmail.addEventListener('beforedelete', function (props) {
+                if (rcmail.env.search_request == 'advanced_search_active') {
+                    advanced_search_perform_action(props, 'delete');
+
+                    return false;
+                }
+            });
+
+            rcmail.addEventListener('beforemark', function (flag) {
+                if (rcmail.env.search_request == 'advanced_search_active') {
+                    var res = advanced_search_check_multi_mbox();
+                    //Update on server
+                    var i;
+                    var sel = res.selections;
+                    for (i in sel) {
+                        var uids = sel[i].join(',');
+                        var lock = false;
+                        var post_data = {
+                            _uid: uids,
+                            _flag: flag,
+                            _mbox: i,
+                            _remote: 1
+                        };
+                        rcmail.http_post('mark', post_data, lock);
+                    }
+                    var raw_selection = rcmail.message_list.get_selection();
+                    for(i in raw_selection) {
+                        var key = raw_selection[i];
+                        switch (flag) {
+                            case 'read':
+                                rcmail.message_list.rows[key].unread = 0;
+                                break;
+                            case 'unread':
+                                rcmail.message_list.rows[key].unread = 1;
+                                break;
+                            case 'flagged':
+                                rcmail.message_list.rows[key].flagged = 1;
+                                break;
+                            case 'unflagged':
+                                rcmail.message_list.rows[key].flagged = 0;
+                                break;
+                        }
+                    }
+                    //Refresh ui
+                    var messages = [];
+                    var selections = rcmail.message_list.get_selection();
+                    var j;
+                    for (j in selections) {
+                        messages.push('#rcmrow' + selections[j]);
+                    }
+                    var selector = messages.join(', ');
+                    var selection = $(selector);
+                    switch (flag) {
+                    case 'read':
+                        selection.removeClass('unread');
+                        break;
+                    case 'unread':
+                        selection.addClass('unread');
+                        break;
+                    case 'flagged':
+                        selection.addClass('flagged');
+                        $("td.flag span", selection).removeClass('unflagged').addClass('flagged');
+                        break;
+                    case 'unflagged':
+                        selection.removeClass('flagged');
+                        $("td.flag span", selection).removeClass('flagged').addClass('unflagged');
+                        break;
+                    default:
+                        break;
+                    }
+                    return false;
+                }
+            });
+
+            rcmail.addEventListener('beforeforward', function (props) {
+                if (rcmail.env.search_request == 'advanced_search_active' && rcmail.message_list.selection.length > 1) {
+                    var res = advanced_search_check_multi_mbox();
+                    if (res.isMulti == true) {
+                        //Selections from more then one folder
+                        return false;
+                    } else {
+                        //Only one folder, redirecting
+                        var i, url, sel = res.selections;
+                        for (i in sel) {
+                            url = '&_forward_uid=' + sel[i].join(',') + '&_mbox=' + i;
+                        }
+                        url += '&_attachment=1&_action=compose';
+                        window.location = location.pathname + rcmail.env.comm_path + url;
+
+                        return false;
+                    }
+                }
+            });
+
+            rcmail.addEventListener('beforeforward-attachment', function (props) {
+                if (rcmail.env.search_request == 'advanced_search_active' && rcmail.message_list.selection.length > 1) {
+                    var res = advanced_search_check_multi_mbox();
+                    if (res.isMulti == true) {
+                        //Selections from more then one folder
+                        return false;
+                    } else {
+                        //Only one folder, redirecting
+                        var i, url, sel = res.selections;
+                        for (i in sel) {
+                            url = '&_forward_uid=' + sel[i].join(',') + '&_mbox=' + i;
+                        }
+                        url += '&_attachment=1&_action=compose';
+                        window.location = location.pathname + rcmail.env.comm_path + url;
+
+                        return false;
+                    }
+                }
+            });
+
+            rcmail.addEventListener('beforetoggle_flag', function (props) {
+                if (rcmail.env.search_request == 'advanced_search_active') {
+                    var flag = $(props).hasClass('unflagged') ? 'flagged' : 'unflagged';
+                    var tr = $(props).closest('tr');
+                    var id = tr.attr('id').replace('rcmrow', '');
+                    var parts = id.split('__MB__');
+                    var lock = false;
+                    var mbox = rcmail.env.as_md5_folders[parts[1]];
+                    var post_data = {
+                        _uid: parts[0],
+                        _flag: flag,
+                        _mbox: mbox,
+                        _remote: 1
+                    };
+                    rcmail.http_post('mark', post_data, lock);
+                    if (flag == 'flagged') {
+                        tr.addClass('flagged');
+                        $("td.flag span", tr).removeClass('unflagged').addClass('flagged');
+                        rcmail.message_list.rows[id].flagged = 1;
+                    } else {
+                        tr.removeClass('flagged');
+                        $("td.flag span", tr).removeClass('flagged').addClass('unflagged');
+                        rcmail.message_list.rows[id].flagged = 0;
+                    }
+                    return false;
+                }
+            });
+            /* End registering event listeners */
+        });
+
     });
 })(jQuery);
