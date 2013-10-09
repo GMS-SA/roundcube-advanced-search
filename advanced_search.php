@@ -2,7 +2,7 @@
 /**
  * Processing an advanced search over an E-Mail Account
  *
- * @version 2.1.0
+ * @version 2.1.1
  * @licence GNU GPLv3+
  * @author  Wilwert Claude
  * @author  Ludovicy Steve
