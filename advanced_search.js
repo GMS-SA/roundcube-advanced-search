@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.1.0
+     * @version 2.1.1
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -59,11 +59,11 @@
         $.stack.html = r.html;
 
         var $html = $(r.html);
-        var saved_searches = '<span class="saved_searches"> Saved searches: <select name="select_saved_search"><option value=""></option></select></span>';
+        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">Saved searches: <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
         title = $('<div>' + r.title + saved_searches + '<div>');
+        var saved_searches_select = $('[name=select_saved_search]', title);
         if (r.saved_searches.length) {
             var i;
-            var saved_searches_select = $('[name=select_saved_search]', title);
             for (i in r.saved_searches) {
                 saved_searches_select.append('<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>');
             }
@@ -83,14 +83,13 @@
             }
         });
 
-        saved_searches_select.hover(
-            function(){
-                $html.dialog('option', 'draggable', false);
-            },
-            function(){
-                $html.dialog('option', 'draggable', true);
-            }
-        );
+        saved_searches_select.bind("blur click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select", function(e) {
+            e.stopPropagation(); 
+        });
+
+        saved_searches_select.bind("mouseenter", function(e) {
+            saved_searches_select.focus();
+        });
 
         saved_searches_select.bind('change', function(e) {
             var search_name = $(this).val();
@@ -353,7 +352,7 @@
                     text: txt['delete'],
                     click: function() {
                         rcmail.http_request('plugin.delete_search', {search_name: search_name});
-                        $("[value=REMOte]", "[name=select_saved_search]").remove();
+                        $("[value=" + search_name + "]", "[name=select_saved_search]").remove();
                         $("[name=select_saved_search]").val("").trigger("change");
                         $( this ).dialog( "close" );
                     },
