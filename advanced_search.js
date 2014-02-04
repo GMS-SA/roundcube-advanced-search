@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.1.1
+     * @version 2.1.2
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
