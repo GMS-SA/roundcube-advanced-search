@@ -891,7 +891,7 @@ class advanced_search extends rcube_plugin
             $args['blocks']['label_display_options'] = array('options' => array(), 'name' => Q($this->gettext('label_display_options')));
 
             $displayOptions = $this->rc->config->get('advanced_search_display_options', array());
-            $target_menu = (isset($displayOptions['target_menu']) && !empty($displayOptions['target_menu'])) ? $displayOptions['target_menu'] : 'toolbar';
+            $target_menu = (isset($displayOptions['target_menu']) && !empty($displayOptions['target_menu'])) ? $displayOptions['target_menu'] : $this->config['target_menu'];
             $options = '';
             $optarg = array('value' => 'messagemenu');
             if ($target_menu == 'messagemenu') {
