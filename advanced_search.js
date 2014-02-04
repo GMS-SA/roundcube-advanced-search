@@ -25,7 +25,7 @@
         messages: null
     };
 
-    $("#button_display_option").live('change', function(e) {
+    $(document).on("change", "#button_display_option", function(e) {
         var img = $('img', $(this).closest('p'));
         var src = img.attr('src');
         if(this.value == 'messagemenu') {
@@ -36,7 +36,7 @@
         img.attr('src', src);
     });
 
-    $("#_show_message_mbox_info, #_show_message_label_header").live('change', function(e) {
+    $(document).on("change", "#_show_message_mbox_info, #_show_message_label_header", function(e) {
         var img = $('img', $(this).closest('p'));
         if($(this).is(':checked')) {
             img.removeClass('disabled');
@@ -189,7 +189,7 @@
      *
      * @param {object} e The event element
      */
-    $('input[name=search]').live('click', function(e) {
+     $(document).on("click", 'input[name=search]', function(e) {
         e.preventDefault();
 
         rcmail.clear_message_list();
@@ -212,7 +212,7 @@
      *
      * @param {object} e The event element
      */
-    $('input[name=reset]').live('click', function(e) {
+    $(document).on("click", 'input[name=reset]', function(e) {
         e.preventDefault();
         $('#adsearch-popup').html($.stack.html);
         $('[name=select_saved_search]').val("");
@@ -223,7 +223,7 @@
      *
      * @param {object} e The event element
      */
-    $('button[name=add]').live('click', function(e) {
+    $(document).on("click", 'button[name=add]', function(e) {
         e.preventDefault();
 
         $(this).closest('tr').after($.stack.row);
@@ -235,7 +235,7 @@
      *
      * @param {object} e The event element
      */
-    $('button[name=delete]').live('click', function(e) {
+    $(document).on("click", 'button[name=delete]', function(e) {
         e.preventDefault();
 
         $(this).closest('tr').remove();
@@ -247,7 +247,7 @@
      *
      * @param {object} e The event element
      */
-    $('select[name=filter]').live('change', function(e) {
+    $(document).on("click", 'select[name=filter]', function(e) {
         var $row_input = $(this).nextUntil('tr', 'input[name=filter-val]'),
             old_avs_type = $row_input.data("avs_type");
 
@@ -305,7 +305,7 @@
      *
      * @param {object} e The event element
      */
-    $('select[name=folder]').live('click', function(e) {
+    $(document).on("click", 'select[name=folder]', function(e) {
         $('span.sub-folders', $(this).closest('form')).css('display', $(this).val() == 'all' ? 'none' : 'inline');
     });
 
@@ -315,7 +315,7 @@
      *
      * @param {object} e The event element
      */
-    $('a.icon.advanced-search, a.button.advanced-search').live('click', function(e) {
+    $(document).on("click", 'a.icon.advanced-search, a.button.advanced-search', function(e) {
         e.preventDefault();
 
         if (!$('#adsearch-popup').length) {
@@ -331,11 +331,11 @@
      *
      * @param {object} e The event element
      */
-    $("#adsearch-popup").live('keydown keypress', function(e) {
+    $(document).on("keydown keypress", "#adsearch-popup", function(e) {
         e.stopPropagation();
     });
 
-    $("#adsearch-popup input.delete_search").live('click', function(e) {
+    $(document).on("click", "#adsearch-popup input.delete_search", function(e) {
         e.stopPropagation();
         e.preventDefault();
         var search_name = $("[name=select_saved_search]").val();
@@ -367,7 +367,7 @@
         });
     });
 
-    $("#save_the_search").live('click', function(e) {
+    $(document).on("click", "#save_the_search", function(e) {
         e.stopPropagation();
         e.preventDefault();
         var save_search = '<table>'
