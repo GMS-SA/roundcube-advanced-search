@@ -59,7 +59,8 @@
         $.stack.html = r.html;
 
         var $html = $(r.html);
-        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">Saved searches: <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
+        var saved_searches_label = rcmail.gettext('saved_searches', 'advanced_search');
+        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
         title = $('<div>' + r.title + saved_searches + '<div>');
         var saved_searches_select = $('[name=select_saved_search]', title);
         if (r.saved_searches.length) {
