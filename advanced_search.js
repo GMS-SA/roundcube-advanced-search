@@ -131,15 +131,17 @@
             $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
         }
     });
-
+//messagelistcontainer table thead 
     rcmail.addEventListener('plugin.advanced_search_add_header', function(evt) {
-        if($("#messagelist #rcavbox").length == 0) {
-            $("#messagelist tr:first").append('<td class="mbox" id="rcavbox"><span class="mbox">Mbox</span></td>');
+        if($("#messagelistcontainer #rcavbox1").length == 0) {
+            $("#messagelistcontainer table.fixedcopy thead tr:first").append('<td class="mbox" id="rcavbox1"><span class="mbox">Mbox</span></td>');
+            $("#messagelistcontainer table#messagelist thead tr:first").append('<td class="mbox" id="rcavbox2"><span class="mbox">Mbox</span></td>');
         }
     });
 
     rcmail.addEventListener('plugin.advanced_search_del_header', function(evt) {
-        $("#messagelist #rcavbox").remove();
+        $("#messagelistcontainer #rcavbox1").remove();
+        $("#messagelistcontainer #rcavbox2").remove();
     });
 
     rcube_webmail.prototype.advanced_search_add_mbox = function (mbox, count, showMbox) {
