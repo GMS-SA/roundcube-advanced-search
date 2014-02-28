@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.1.2
+     * @version 2.1.3
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -59,7 +59,8 @@
         $.stack.html = r.html;
 
         var $html = $(r.html);
-        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">Saved searches: <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
+        var saved_searches_label = rcmail.gettext('saved_searches', 'advanced_search');
+        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
         title = $('<div>' + r.title + saved_searches + '<div>');
         var saved_searches_select = $('[name=select_saved_search]', title);
         if (r.saved_searches.length) {
@@ -131,15 +132,17 @@
             $("[name=filter-val]", row).val(saved_search[i]['filter-val']);
         }
     });
-
+//messagelistcontainer table thead 
     rcmail.addEventListener('plugin.advanced_search_add_header', function(evt) {
-        if($("#messagelist #rcavbox").length == 0) {
-            $("#messagelist tr:first").append('<td class="mbox" id="rcavbox"><span class="mbox">Mbox</span></td>');
+        if($("#messagelistcontainer #rcavbox1").length == 0) {
+            $("#messagelistcontainer table.fixedcopy thead tr:first").append('<td class="mbox" id="rcavbox1"><span class="mbox">Mbox</span></td>');
+            $("#messagelistcontainer table#messagelist thead tr:first").append('<td class="mbox" id="rcavbox2"><span class="mbox">Mbox</span></td>');
         }
     });
 
     rcmail.addEventListener('plugin.advanced_search_del_header', function(evt) {
-        $("#messagelist #rcavbox").remove();
+        $("#messagelistcontainer #rcavbox1").remove();
+        $("#messagelistcontainer #rcavbox2").remove();
     });
 
     rcube_webmail.prototype.advanced_search_add_mbox = function (mbox, count, showMbox) {

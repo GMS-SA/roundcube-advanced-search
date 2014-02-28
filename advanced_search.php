@@ -2,7 +2,7 @@
 /**
  * Processing an advanced search over an E-Mail Account
  *
- * @version 2.1.2
+ * @version 2.1.3
  * @licence GNU GPLv3+
  * @author  Wilwert Claude
  * @author  Ludovicy Steve
@@ -61,6 +61,11 @@ class advanced_search extends rcube_plugin
         $this->skin = $this->rc->config->get('skin');
         $this->add_texts('localization', true);
         $this->populate_i18n();
+        if(isset($this->config['criteria'])) {
+            foreach($this->config['criteria'] as $key => $translation) {
+                $this->config['criteria'][$key] = $this->gettext($key);
+            }
+        }
         $this->include_script('advanced_search.min.js');
 
         if ($this->rc->task == 'mail') {
@@ -488,11 +493,11 @@ class advanced_search extends rcube_plugin
 
         $criteria = $this->config['criteria'];
         $all_criteria = array(
-            'Common' => $this->config['prefered_criteria'],
-            'Addresses' => $this->config['email_criteria'],
-            'Dates' => $this->config['date_criteria'],
-            'Flags' => $this->config['flag_criteria'],
-            'Other' => $this->config['other_criteria'],
+            $this->gettext('Common') => $this->config['prefered_criteria'],
+            $this->gettext('Addresses') => $this->config['email_criteria'],
+            $this->gettext('Dates') => $this->config['date_criteria'],
+            $this->gettext('Flags') => $this->config['flag_criteria'],
+            $this->gettext('Other') => $this->config['other_criteria'],
         );
 
         foreach ($all_criteria as $label => $specific_criteria) {
