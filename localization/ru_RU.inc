@@ -47,3 +47,6 @@
     $labels['SINCE'] = 'Получено после'; 
     $labels['SMALLER'] = 'Размер меньше';  
     $labels['SUBJECT'] = 'Тема';
+    $labels['name'] = 'Название';
+    $labels['save'] = 'Сохранить';
+    $labels['mbox'] = 'Ящик';

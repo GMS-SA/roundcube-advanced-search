@@ -47,3 +47,6 @@
     $labels['SINCE'] = 'Since';
     $labels['SMALLER'] = 'Smaller Than';
     $labels['SUBJECT'] = 'Subject Contains';
+    $labels['name'] = 'Name';
+    $labels['save'] = 'Save';
+    $labels['mbox'] = 'Folder';

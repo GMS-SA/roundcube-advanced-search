@@ -135,8 +135,9 @@
 //messagelistcontainer table thead 
     rcmail.addEventListener('plugin.advanced_search_add_header', function(evt) {
         if($("#messagelistcontainer #rcavbox1").length == 0) {
-            $("#messagelistcontainer table.fixedcopy thead tr:first").append('<td class="mbox" id="rcavbox1"><span class="mbox">Mbox</span></td>');
-            $("#messagelistcontainer table#messagelist thead tr:first").append('<td class="mbox" id="rcavbox2"><span class="mbox">Mbox</span></td>');
+            var Mbox = rcmail.gettext('mbox', 'advanced_search');
+            $("#messagelistcontainer table.fixedcopy thead tr:first").append('<td class="mbox" id="rcavbox1"><span class="mbox">' + Mbox + '</span></td>');
+            $("#messagelistcontainer table#messagelist thead tr:first").append('<td class="mbox" id="rcavbox2"><span class="mbox">' + Mbox + '</span></td>');
         }
     });
 
@@ -373,9 +374,12 @@
     $(document).on("click", "#save_the_search", function(e) {
         e.stopPropagation();
         e.preventDefault();
+        var labelName = rcmail.gettext('name', 'advanced_search');
+        var labelSave = rcmail.gettext('save', 'advanced_search');
+        var labelCancel = rcmail.gettext('cancel', 'advanced_search');
         var save_search = '<table>'
-                        + '  <tr><td>Name:</td><td><input type="text" name="search_name" /></td></tr>'
-                        + '  <tr><td></td><td><input type="submit" class="button mainaction" value="Save" /> <input type="reset" class="button reset" value="Cancel" /></td></tr>'
+                        + '  <tr><td>' + labelName + ' </td><td><input type="text" name="search_name" /></td></tr>'
+                        + '  <tr><td></td><td><input type="submit" class="button mainaction" value="' + labelSave  + '" /> <input type="reset" class="button reset" value="' + labelCancel + '" /></td></tr>'
                         + '</table>';
         save_search = $(save_search);
         $("[name=search_name]", save_search).val($("[name=select_saved_search]").val());

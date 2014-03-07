@@ -46,3 +46,6 @@
     $labels['SINCE'] = 'Datant d\'après le';
     $labels['SMALLER'] = 'Plus petit que';
     $labels['SUBJECT'] = 'Objet contenant';
+    $labels['name'] = 'Nom';
+    $labels['save'] = 'Sauvegarder';
+    $labels['mbox'] = 'Dossier';
