@@ -25,6 +25,8 @@
         messages: null
     };
 
+    var search_loading = '';
+
     $(document).on("change", "#button_display_option", function(e) {
         var img = $('img', $(this).closest('p'));
         var src = img.attr('src');
@@ -201,6 +203,7 @@
         $.stack.messages = $('tr', $('tbody', '#messagelist'));
 
         var $form = $("#adsearch-popup form");
+        search_loading = rcmail.set_busy(true, 'loading');
         rcmail.http_request('plugin.trigger_search',
                             {search: get_search_data(),
                              current_folder: rcmail.env.mailbox,
@@ -524,6 +527,7 @@
         rcmail.enable_command('plugin.advanced_search', true);
 
         rcmail.addEventListener('plugin.search_complete', function(r) {
+            rcmail.set_busy(false, 'loading', search_loading);
             /* Start registering event listeners for handling drag/drop, marking, flagging etc... */
             rcmail.addEventListener('beforeedit', function (command) {
                 rcmail.env.framed = true;
