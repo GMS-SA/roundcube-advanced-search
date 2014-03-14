@@ -46,3 +46,6 @@
     $labels['SINCE'] = 'Seit';
     $labels['SMALLER'] = 'Kleiner als';
     $labels['SUBJECT'] = 'Betreff enthält';
+    $labels['name'] = 'Name';
+    $labels['save'] = 'Speichern';
+    $labels['mbox'] = 'Ordner';
