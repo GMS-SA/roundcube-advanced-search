@@ -173,8 +173,8 @@
 
         if ($tr.length) {
             $tr.each(function() {
-                    var item = {not: $('input[name=not]', $(this)).attr('checked') == 'checked',
-                                excluded: $('input[name=filter-exclude]', $(this)).attr('checked') == 'checked',
+                    var item = {not: $('input[name=not]', $(this)).prop('checked'),
+                                excluded: $('input[name=filter-exclude]', $(this)).prop('checked'),
                                 filter: $('option:selected', $('select[name=filter]', $(this))).val(),
                                 'filter-val': $('input[name=filter-val]', $(this)).val()};
 
@@ -208,7 +208,7 @@
                             {search: get_search_data(),
                              current_folder: rcmail.env.mailbox,
                              folder: $('select[name=folder]', $form).val(),
-                             sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
+                             sub_folders: $('input[name=subfolder]', $form).prop('checked')});
 
         $("#adsearch-popup").closest('div.ui-dialog-content').dialog('close');
     });
@@ -406,7 +406,7 @@
                             {search: get_search_data(),
                              search_name: search_name,
                              folder: $('select[name=folder]', $form).val(),
-                             sub_folders: $('input[name=subfolder]', $form).attr('checked') == 'checked'});
+                             sub_folders: $('input[name=subfolder]', $form).prop('checked')});
            var isNewSearch = true;
            $("[name=select_saved_search] option").each(function(e) {
                if ($(this).attr("value") == search_name) {
