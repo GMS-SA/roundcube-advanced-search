@@ -10,7 +10,7 @@
     $labels['andsubfolders'] = 'En submappen';
     $labels['allfolders'] = 'Alle mappen';
     $labels['advancedsearch'] = 'Geavanceerd zoeken';
-    $labels['label_display_options'] = 'Weergaveopties in geavanceerde zoekresultaten';
+    $labels['label_display_options'] = 'Weergaveopties van geavanceerde zoekresultaten';
     $labels['mailbox_headers_in_results'] = 'Toon mailbox titel als rij';
     $labels['mailbox_info_in_results'] = 'Toon mailbox titel als kolom';
     $labels['display_in_messagemenu'] = 'in het dropdown menu';
