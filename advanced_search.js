@@ -76,13 +76,14 @@
             height: 300,
             resizable: true,
             draggable: true,
-            title: title,
             dialogClass: "advanced_search_dialog",
             close: function() {
                 $('body').css('overflow', 'auto');
             },
             create: function() {
                 $('body').css('overflow', 'hidden');
+                $(this).siblings().find(".ui-dialog-title").html(title);
+                
             }
         });
 
