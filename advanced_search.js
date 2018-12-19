@@ -2,7 +2,7 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.1.5
+     * @version 2.1.6
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
@@ -60,17 +60,20 @@
         $.stack.row = r.row;
         $.stack.html = r.html;
 
-        var $html = $(r.html);
         var saved_searches_label = rcmail.gettext('saved_searches', 'advanced_search');
-        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
-        title = $('<div>' + r.title + saved_searches + '<div>');
-        var saved_searches_select = $('[name=select_saved_search]', title);
+        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search">';
+        title = r.title;
+        saved_searches = saved_searches + '<option value=""></option>';
         if (r.saved_searches.length) {
             var i;
             for (i in r.saved_searches) {
-                saved_searches_select.append('<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>');
+                    saved_searches = saved_searches + '<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>';
             }
         }
+        saved_searches = saved_searches + '</select></label></span>';
+        $.stack.saved_searches = saved_searches;
+        var $html = $("<div>" + saved_searches + r.html + "</div>");
+        saved_searches_select = $('[name=select_saved_search]', $html);
         $html.dialog({
             width: 640,
             height: 300,
