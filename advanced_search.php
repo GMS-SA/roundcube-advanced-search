@@ -98,16 +98,16 @@ class advanced_search extends rcube_plugin
 
     public function startup($args)
     {
-        $search = rcube_utils::get_input_value('_search', INPUT_GET);
+        $search = rcube_utils::get_input_value('_search', rcube_utils::INPUT_GET);
         if (!isset($search)) {
-            $search = rcube_utils::get_input_value('_search', INPUT_POST);
+            $search = rcube_utils::get_input_value('_search', rcube_utils::INPUT_POST);
         }
         $rsearch = $search == 'advanced_search_active';
-        $uid = rcube_utils::get_input_value('_uid', INPUT_GET);
-        $draft_uid = rcube_utils::get_input_value('_draft_uid', INPUT_GET);
-        $mbox = rcube_utils::get_input_value('_mbox', INPUT_GET);
-        $page = rcube_utils::get_input_value('_page', INPUT_GET);
-        $sort = rcube_utils::get_input_value('_sort', INPUT_GET);
+        $uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GET);
+        $draft_uid = rcube_utils::get_input_value('_draft_uid', rcube_utils::INPUT_GET);
+        $mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GET);
+        $page = rcube_utils::get_input_value('_page', rcube_utils::INPUT_GET);
+        $sort = rcube_utils::get_input_value('_sort', rcube_utils::INPUT_GET);
 
         if (!empty($uid)) {
             $parts = explode('__MB__', $uid);
@@ -129,7 +129,7 @@ class advanced_search extends rcube_plugin
                 $this->rc->output->redirect(array('_task' => 'mail', '_action' => $args['action'], '_mbox' => $mbox, '_uid' => $uid));
             }
             if ($args['action'] == 'compose') {
-                $draft_uid = rcube_utils::get_input_value('_draft_uid', INPUT_GET);
+                $draft_uid = rcube_utils::get_input_value('_draft_uid', rcube_utils::INPUT_GET);
                 $parts = explode('__MB__', $draft_uid);
                 $draft_uid = $parts[0];
                 if (!empty($draft_uid)) {
@@ -142,20 +142,20 @@ class advanced_search extends rcube_plugin
                 $args['abort'] = true;
             }
             if ($args['action'] == 'mark') {
-                $flag = rcube_utils::get_input_value('_flag', RCUBE_INPUT_POST);
-                $uid = rcube_utils::get_input_value('_uid', RCUBE_INPUT_POST);
+                $flag = rcube_utils::get_input_value('_flag', rcube_utils::INPUT_POST);
+                $uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_POST);
 
                 $post_str = '_flag=' . $flag . '&_uid=' . $uid;
-                if ($quiet = rcube_utils::get_input_value('_quiet', RCUBE_INPUT_POST)) {
+                if ($quiet = rcube_utils::get_input_value('_quiet', rcube_utils::INPUT_POST)) {
                     $post_str .= '&_quiet=' . $quiet;
                 }
-                if ($from = rcube_utils::get_input_value('_from', RCUBE_INPUT_POST)) {
+                if ($from = rcube_utils::get_input_value('_from', rcube_utils::INPUT_POST)) {
                     $post_str .= '&_from=' . $from;
                 }
-                if ($count = rcube_utils::get_input_value('_count', RCUBE_INPUT_POST)) {
+                if ($count = rcube_utils::get_input_value('_count', rcube_utils::INPUT_POST)) {
                     $post_str .= '&_count=' . $count;
                 }
-                if ($ruid = rcube_utils::get_input_value('_ruid', RCUBE_INPUT_POST)) {
+                if ($ruid = rcube_utils::get_input_value('_ruid', rcube_utils::INPUT_POST)) {
                     $post_str .= '&_ruid=' . $ruid;
                 }
                 $this->rc->output->command('label_mark', $post_str);
@@ -437,7 +437,7 @@ class advanced_search extends rcube_plugin
     {
         $search_button = new html_inputfield(array('type' => 'submit', 'name' => 'search', 'class' => 'button mainaction', 'value' => $this->i18n_strings['search']));
         $reset_button = new html_inputfield(array('type' => 'reset', 'name' => 'reset', 'class' => 'button reset', 'value' => $this->i18n_strings['resetsearch']));
-        $save_button = html::tag('input', array('type' => 'submit', 'name' => 'save_the_search', id=> 'save_the_search', 'class' => 'button save_search', 'value' => $this->i18n_strings['save_the_search']));
+        $save_button = html::tag('input', array('type' => 'submit', 'name' => 'save_the_search', 'id'=> 'save_the_search', 'class' => 'button save_search', 'value' => $this->i18n_strings['save_the_search']));
         $delete_button = new html_inputfield(array('type' => 'submit', 'name' => 'delete', 'style' => 'display: none;', 'class' => 'button delete_search', 'value' => $this->i18n_strings['deletesearch']));
 
         $layout_table = new html_table();
@@ -589,20 +589,20 @@ class advanced_search extends rcube_plugin
      */
     public function trigger_search($inPagination = false)
     {
-        $search = rcube_utils::get_input_value('search', RCUBE_INPUT_GPC);
+        $search = rcube_utils::get_input_value('search', rcube_utils::INPUT_GPC);
         // reset list_page and old search results
         $this->rc->storage->set_page(1);
         $this->rc->storage->set_search_set(null);
-        $page = rcube_utils::get_input_value('_page', RCUBE_INPUT_GPC);
+        $page = rcube_utils::get_input_value('_page', rcube_utils::INPUT_GPC);
         $page = $page ? $page : 1;
         $pagesize = $this->rc->storage->get_pagesize();
 
         if (!empty($search)) {
-            $mbox = rcube_utils::get_input_value('folder', RCUBE_INPUT_GPC);
-            $imap_charset = RCMAIL_CHARSET;
+            $mbox = rcube_utils::get_input_value('folder', rcube_utils::INPUT_GPC);
+            $imap_charset = RCUBE_CHARSET;
             $sort_column = rcmail_sort_column();
             $search_str = $this->get_search_query($search);
-            $sub_folders = rcube_utils::get_input_value('sub_folders', RCUBE_INPUT_GPC) == 'true';
+            $sub_folders = rcube_utils::get_input_value('sub_folders', rcube_utils::INPUT_GPC) == 'true';
             $folders = array();
             $result_h = array();
             $count = 0;
@@ -612,7 +612,7 @@ class advanced_search extends rcube_plugin
             //Store information in session for pagination
             $_SESSION['av_search'] = $search;
             $_SESSION['av_folder'] = $mbox;
-            $_SESSION['av_sub_folders'] = rcube_utils::get_input_value('sub_folders', RCUBE_INPUT_GPC);
+            $_SESSION['av_sub_folders'] = rcube_utils::get_input_value('sub_folders', rcube_utils::INPUT_GPC);
             $nosub = $sub_folders;
             $folders = $this->rc->get_storage()->list_folders_subscribed();
             if (empty($folders) || ($sub_folders === false && $mbox !== 'all')) {
@@ -647,7 +647,7 @@ class advanced_search extends rcube_plugin
                 $this->rc->output->show_message('searchnomatch', 'notice');
             }
 
-            $current_folder = rcube_utils::get_input_value('current_folder', RCUBE_INPUT_GPC);
+            $current_folder = rcube_utils::get_input_value('current_folder', rcube_utils::INPUT_GPC);
 
             $this->rc->output->set_env('search_request', 'advanced_search_active');
             $this->rc->output->set_env('messagecount', $count);
@@ -748,9 +748,9 @@ class advanced_search extends rcube_plugin
                     }
                     $cont = rcube::Q($cont);
                 } elseif ($col == 'size') {
-                    $cont = show_bytes($header->$col);
+                    $cont = rcmail::get_instance()->show_bytes($header->$col);
                 } elseif ($col == 'date') {
-                    $cont = format_date($header->date);
+                    $cont = rcmail::get_instance()->format_date($header->date);
                 } else {
                     $cont = rcube::Q($header->$col);
                 }
@@ -859,9 +859,9 @@ class advanced_search extends rcube_plugin
         $rcmail = rcmail::get_instance();
 
         $displayOptions = array();
-        $displayOptions['_show_message_label_header'] = rcube_utils::get_input_value('_show_message_label_header', RCUBE_INPUT_POST) == 1 ? true : false;
-        $displayOptions['_show_message_mbox_info'] = rcube_utils::get_input_value('_show_message_mbox_info', RCUBE_INPUT_POST) == 1 ? true : false;
-        $displayOptions['target_menu'] = rcube_utils::get_input_value('button_display_option', RCUBE_INPUT_POST);
+        $displayOptions['_show_message_label_header'] = rcube_utils::get_input_value('_show_message_label_header', rcube_utils::INPUT_POST) == 1 ? true : false;
+        $displayOptions['_show_message_mbox_info'] = rcube_utils::get_input_value('_show_message_mbox_info', rcube_utils::INPUT_POST) == 1 ? true : false;
+        $displayOptions['target_menu'] = rcube_utils::get_input_value('button_display_option', rcube_utils::INPUT_POST);
 
         $args['prefs']['advanced_search_display_options'] = $displayOptions;
 
@@ -957,7 +957,7 @@ class advanced_search extends rcube_plugin
         $folder_count = array();
         foreach ($folders_search as $mbox) {
             $this->rc->storage->set_folder($mbox);
-            $this->rc->storage->search($mbox, $search_string, RCMAIL_CHARSET, $_SESSION['sort_col']);
+            $this->rc->storage->search($mbox, $search_string, RCUBE_CHARSET, $_SESSION['sort_col']);
             $result = array();
             $fcount = $this->rc->storage->count($mbox, 'ALL', !empty($_REQUEST['_refresh']));
             $count += $fcount;
@@ -1000,7 +1000,7 @@ class advanced_search extends rcube_plugin
             $multiPage = "true";
         }
         $this->rc->storage->set_folder($mailbox);
-        $this->rc->storage->search($mailbox, $search_string, RCMAIL_CHARSET, $_SESSION['sort_col']);
+        $this->rc->storage->search($mailbox, $search_string, RCUBE_CHARSET, $_SESSION['sort_col']);
         $messages = $this->rc->storage->list_messages('', $startPage);
         if ($multiPage) {
             $messages = array_merge($messages, $this->rc->storage->list_messages('', $startPage+1));
@@ -1026,13 +1026,13 @@ class advanced_search extends rcube_plugin
 
     public function save_search()
     {
-        $search_name = rcube_utils::get_input_value('search_name', RCUBE_INPUT_GPC);
+        $search_name = rcube_utils::get_input_value('search_name', rcube_utils::INPUT_GPC);
         if ($search_name) {
             $search = array();
-            $search['search'] = rcube_utils::get_input_value('search', RCUBE_INPUT_GPC);
+            $search['search'] = rcube_utils::get_input_value('search', rcube_utils::INPUT_GPC);
             $search['search_name'] = $search_name;
-            $search['folder'] = rcube_utils::get_input_value('folder', RCUBE_INPUT_GPC);
-            $search['sub_folders'] = rcube_utils::get_input_value('sub_folders', RCUBE_INPUT_GPC);
+            $search['folder'] = rcube_utils::get_input_value('folder', rcube_utils::INPUT_GPC);
+            $search['sub_folders'] = rcube_utils::get_input_value('sub_folders', rcube_utils::INPUT_GPC);
             $prefs = (array)$this->rc->user->get_prefs();
             if (!isset($prefs['advanced_search'])) {
                 $prefs['advanced_search'] = array();
@@ -1045,7 +1045,7 @@ class advanced_search extends rcube_plugin
 
     public function delete_search()
     {
-        $search_name = rcube_utils::get_input_value('search_name', RCUBE_INPUT_GPC);
+        $search_name = rcube_utils::get_input_value('search_name', rcube_utils::INPUT_GPC);
         if ($search_name) {
             $prefs = (array)$this->rc->user->get_prefs();
             unset($prefs['advanced_search'][$search_name]);
@@ -1056,7 +1056,7 @@ class advanced_search extends rcube_plugin
 
     public function get_saved_search()
     {
-        $search_name = rcube_utils::get_input_value('search_name', RCUBE_INPUT_GPC);
+        $search_name = rcube_utils::get_input_value('search_name', rcube_utils::INPUT_GPC);
         $prefs = (array)$this->rc->user->get_prefs();
         if (!isset($prefs['advanced_search'])) {
             $prefs['advanced_search'] = array();
