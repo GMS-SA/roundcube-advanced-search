@@ -1,3 +1,9 @@
+I forked this long since updated plugin that I personally love and will try to keep it alive.
+
+Thanks and enjoy!
+
+General
+
 
 Advanced Search Plugin for Roundcube
 ====================================
@@ -36,7 +42,7 @@ folder for details on the skin license.
 ### GIT :
 * Clone the GitHub repository to 'advanced_search':
 
- >     git clone git://github.com/GMS-SA/roundcube-advanced-search.git advanced_search
+ >     git clone git://github.com/texxasrulez/roundcube-advanced-search.git advanced_search
 
 * Change to the 'stable' branch:
 
@@ -60,9 +66,6 @@ folder for details on the skin license.
 * Add advanced_search to $rcmail_config['plugins'] in your Roundcube config
 
 * To override defaults, copy the config-default.inc.php file to config.inc.php and modify
-
-## Upgrade
-If upgrading from 1.2.0 or lower, you *must* review the config file.
 
 ## Configuration
 
