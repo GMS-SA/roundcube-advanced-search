@@ -2,14 +2,14 @@
   "name": "texxasrulez/advanced_search",
   "description": "Add Advanced Search Capabilities",
   "keywords": ["search","mail","advanced"],
-  "homepage": "https://github.com/texxasrulez/roundcube-advanced-search",
-  "license": "GPLv3",
+  "homepage": "https://github.com/texxasrulez/dvanced-_earch",
+  "license": "GPL-3.0-only",
   "type": "roundcube-plugin",
   "version": "3.1",
   "authors": [
     {
       "name": "Gene Hawkins",
-      "email": "gene@genesworld.net",
+      "email": "texxasrulez@yahoo.com",
       "role": "Developer"
     }
   ],
