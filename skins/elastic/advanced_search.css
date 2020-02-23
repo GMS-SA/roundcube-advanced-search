@@ -1,6 +1,5 @@
-a.icon.advanced-search span.advanced-search {
-    background-image: url(images/icon-loupe.png) !important;
-    background-position: 0 !important;
+.listing.iconized tr.advancedsearch>td.section:before {
+  content: "\f00e"
 }
 
 a.button.advanced-search {
@@ -106,14 +105,6 @@ td.adv-search-and-or {
 
 #rcavbox1, #rcavbox2 {
     width: 30%;
-}
-
-#rcmrowadvancedsearch td.section {
-    background-position: 6px -1650px !important;
-}
-
-#rcmrowadvancedsearch.selected td.section {
-    background-position: 6px -1674px !important;
 }
 
 p.avsearchpref span {
