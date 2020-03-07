@@ -2,7 +2,7 @@
   "name": "texxasrulez/advanced_search",
   "description": "Add Advanced Search Capabilities",
   "keywords": ["search","mail","advanced"],
-  "homepage": "https://github.com/texxasrulez/dvanced-_earch",
+  "homepage": "https://github.com/texxasrulez/advanced_search",
   "license": "GPL-3.0-only",
   "type": "roundcube-plugin",
   "version": "3.1",
