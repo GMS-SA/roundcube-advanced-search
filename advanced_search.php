@@ -48,7 +48,7 @@ class advanced_search extends rcube_plugin
     public function init()
     {
         $this->rc = rcmail::get_instance();
-        $this->load_config("config-default.inc.php");
+        $this->load_config("config.inc.php");
         $this->load_config();
         $this->config = $this->rc->config->get('advanced_search_plugin');
         $this->register_action('plugin.display_advanced_search', array($this, 'display_advanced_search'));
