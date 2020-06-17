@@ -1,9 +1,11 @@
-a.icon.advanced-search span.advanced-search {
+/* Advanced Search "Larry" */
+
+a.icon.advanced_search span.advanced_search {
     background-image: url(images/icon-loupe.png) !important;
     background-position: 0 !important;
 }
 
-a.button.advanced-search {
+a.button.advanced_search {
     text-align: center;
     font-size: 10px;
     color: #555;

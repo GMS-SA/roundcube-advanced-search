@@ -1,12 +1,12 @@
-a.icon.advanced-search span.advanced-search {
+a.icon.advanced_search span.advanced_search {
     background-image: url(images/icon-loupe.png) !important;
     background-position: 0 !important;
 }
 
-a.button.advanced-search {
+a.button.advanced_search {
     text-align: center;
     font-size: 10px;
-    color: inherit;
+    color: f6fbfc;
     min-width: 50px;
     max-width: 75px;
     height: 13px;
@@ -14,7 +14,6 @@ a.button.advanced-search {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 28px 2px 0 2px;
-    text-shadow: 0px 1px 1px #eee;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;

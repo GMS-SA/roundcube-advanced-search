@@ -322,7 +322,7 @@
      *
      * @param {object} e The event element
      */
-    $(document).on("click", 'a.icon.advanced-search, a.button.advanced-search', function(e) {
+    $(document).on("click", 'a.icon.advanced_search, a.button.advanced_search', function(e) {
         e.preventDefault();
 
         if (!$('#adsearch-popup').length) {

@@ -1,27 +1,11 @@
+/* Advanced Search "Elastic" */
+
 .listing.iconized tr.advancedsearch>td.section:before {
-  content: "\f00e"
+    content: "\f002";
 }
 
-a.button.advanced-search {
-    text-align: center;
-    font-size: 10px;
-    color: #555;
-    min-width: 50px;
-    max-width: 75px;
-    height: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: 28px 2px 0 2px;
-    text-shadow: 0px 1px 1px #eee;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    -o-box-shadow: none;
-    background: url(../../../../skins/larry/images/buttons.png?v=abf1.36693) -100px 0 no-repeat transparent;
-    border: 0;
-    border-radius: 0;
-    background-position: center -970px;
+.menu a.advanced_search:before {
+    content: "\f002";
 }
 
 .records-table tbody .aslabel_mbox td {
@@ -105,6 +89,14 @@ td.adv-search-and-or {
 
 #rcavbox1, #rcavbox2 {
     width: 30%;
+}
+
+#rcmrowadvancedsearch td.section {
+    background-position: 6px -1650px !important;
+}
+
+#rcmrowadvancedsearch.selected td.section {
+    background-position: 6px -1674px !important;
 }
 
 p.avsearchpref span {
