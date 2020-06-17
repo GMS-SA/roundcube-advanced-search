@@ -221,13 +221,14 @@ class advanced_search extends rcube_plugin
             $this->api->add_content(
                 $this->api->output->button(
                     array(
-                        'command'    => 'plugin.advanced_search',
-                        'title'      => 'advsearch',
-                        'label'      => 'search',
-                        'type'       => 'link',
-                        'classact'   => 'button advanced_search active',
-                        'class'      => 'button advanced_search',
-                        'innerclass' => 'button advanced_search',
+                            'command'    => 'plugin.advanced_search',
+                            'label'      => 'search',
+                            'type'       => 'link',
+                            'class'      => 'button advanced_search',
+                            'classact'   => 'button advanced_search',
+							'classsel'   => 'button advanced_search pressed',
+							'title'      => 'advsearch',
+                            'innerclass' => 'inner',
                     )
                 ),
                 $target_menu
@@ -418,12 +419,12 @@ class advanced_search extends rcube_plugin
      */
     public function display_advanced_search()
     {
-        $ret = array('html' => $this->generate_searchbox(),
-                     'row' => $this->add_row(),
+        $ret = array('html'           => $this->generate_searchbox(),
+                     'row'            => $this->add_row(),
                      'saved_searches' => $this->get_saved_search_names(),
-                     'title' => $this->i18n_strings['advsearch'],
-                     'date_criteria' => $this->config['date_criteria'],
-                     'flag_criteria' => $this->config['flag_criteria'],
+                     'title'          => $this->i18n_strings['advsearch'],
+                     'date_criteria'  => $this->config['date_criteria'],
+                     'flag_criteria'  => $this->config['flag_criteria'],
                      'email_criteria' => $this->config['email_criteria']);
 
         $this->rc->output->command('plugin.show', $ret);
@@ -931,9 +932,9 @@ class advanced_search extends rcube_plugin
                 $img2class = 'disabled';
             }
 
-            $img1 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_row.jpg'), 'class' => $img1class));
-            $img2 = html::img(array('src' => $this->url('skins/larry/images/show_mbox_col.jpg'), 'class' => $img2class));
-            $img3 = html::img(array('src' => $this->url('skins/larry/images/' . $target_image)));
+            $img1 = html::img(array('src' => $this->url('skins/' . $this->skin . '/images/show_mbox_row.jpg'), 'class' => $img1class));
+            $img2 = html::img(array('src' => $this->url('skins/' . $this->skin . '/images/show_mbox_col.jpg'), 'class' => $img2class));
+            $img3 = html::img(array('src' => $this->url('skins/' . $this->skin . '/images/' . $target_image)));
 
             $check2 = html::tag('input', $arg2);
             $args['blocks']['label_display_options']['options'][0] = array('title' => '', 'content' => '<p class="avsearchpref"><span>' . $check1 . ' ' . $label1 . '</span> ' . $img1 . '</p>');

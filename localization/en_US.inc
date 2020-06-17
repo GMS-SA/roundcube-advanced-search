@@ -9,13 +9,13 @@
     $labels['andsubfolders'] = 'and subfolders';
     $labels['allfolders'] = 'All Folders';
 	$labels['advsearch'] = 'Advanced Search';
-    $labels['advancedsearch'] = 'Advanced search';
+    $labels['advancedsearch'] = 'Advanced Search';
     $labels['label_display_options'] = 'Display options in search results';
     $labels['mailbox_headers_in_results'] = 'Show mailbox title as row';
     $labels['mailbox_info_in_results'] = 'Show mailbox title as column';
     $labels['display_in_messagemenu'] = 'in message menu';
     $labels['display_in_toolbar'] = 'as button in toolbar';
-	$lables['search'] = 'Advanced Search';
+	$lables['search'] = 'Search';
     $labels['show_advanced_search'] = 'Show advanced search';
     $labels['saved_searches'] = 'Saved searches';
     $labels['save_the_search'] = 'Save this search';
