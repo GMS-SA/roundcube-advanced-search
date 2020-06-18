@@ -91,7 +91,6 @@ class advanced_search extends rcube_plugin
         $this->add_hook('startup', array($this, 'startup'));
     }
 
-
     public function startup($args)
     {
         $search = rcube_utils::get_input_value('_search', rcube_utils::INPUT_GET);
@@ -111,6 +110,7 @@ class advanced_search extends rcube_plugin
                 $search = 'advanced_search_active';
             }
         }
+
         if (!empty($draft_uid)) {
             $parts = explode('__MB__', $draft_uid);
             if (count($parts) == 2) {
@@ -569,7 +569,7 @@ class advanced_search extends rcube_plugin
         return $select;
     }
 
-    public function trigger_search_pagination($param)
+    public function trigger_search_pagination()
     {
         $_GET['search'] = $_SESSION['av_search'];
         $_GET['folder'] = $_SESSION['av_folder'];
@@ -804,7 +804,6 @@ class advanced_search extends rcube_plugin
         return $uid_mboxes;
     }
 
-
     private function do_pagination($folders, $onPage)
     {
         $perPage = $this->rc->storage->get_pagesize();
@@ -852,7 +851,7 @@ class advanced_search extends rcube_plugin
         if ($args['section'] != 'advancedsearch') {
             return;
         }
-        $rcmail = rcmail::get_instance();
+        $RCMAIL = rcmail::get_instance();
 
         $displayOptions = array();
         $displayOptions['_show_message_label_header'] = rcube_utils::get_input_value('_show_message_label_header', rcube_utils::INPUT_POST) == 1 ? true : false;
