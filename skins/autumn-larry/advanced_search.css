@@ -8,7 +8,7 @@ a.icon.advanced_search span.advanced_search {
 a.button.advanced_search {
     text-align: center;
     font-size: 10px;
-    color: inherit;
+    color: fdf6f3;
     min-width: 50px;
     max-width: 75px;
     height: 13px;
@@ -16,7 +16,6 @@ a.button.advanced_search {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 28px 2px 0 2px;
-    text-shadow: 0px 1px 1px #eee;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
