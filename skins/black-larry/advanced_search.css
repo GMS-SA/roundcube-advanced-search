@@ -8,7 +8,7 @@ a.icon.advanced_search span.advanced_search {
 a.button.advanced_search {
     text-align: center;
     font-size: 10px;
-    color: inherit;
+    color: #fff;
     min-width: 50px;
     max-width: 75px;
     height: 13px;
@@ -16,7 +16,7 @@ a.button.advanced_search {
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 28px 2px 0 2px;
-    text-shadow: 0px 1px 1px #eee;
+    text-shadow: none;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
@@ -34,7 +34,7 @@ a.button.advanced_search {
     font-weight: normal;
     background-color: inherit;
     color: inherit;
-    text-shadow: 0px 1px 1px inherit;
+    text-shadow: none;
     text-decoration: none;
     font-weight: bold;
 }
@@ -67,7 +67,7 @@ a.button.advanced_search {
     margin: 0 2px;
     padding: 2px 5px;
     color: inherit;
-    text-shadow: 0px 1px 1px inherit;
+    text-shadow: none;
     border: 1px solid inherit;
     border-radius: 4px;
     background: #inherit;
