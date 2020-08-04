@@ -3,7 +3,7 @@
   "description": "Add Advanced Search Capabilities",
   "keywords": ["search","mail","advanced"],
   "homepage": "https://github.com/texxasrulez/advanced_search",
-  "license": "GPL-3.0-only",
+  "license": "GPL-3.0",
   "type": "roundcube-plugin",
   "version": "3.3",
   "authors": [
