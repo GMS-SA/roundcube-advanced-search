@@ -1,40 +1,15 @@
 # Advanced Search Plugin for Roundcube
 
-Advanced Search Plugin for Roundcube
-====================================
+## Installation Instructions
 
-## Getting It
+### Composer
+In the root of your Roundcube root directory using a terminal, type `composer require texxasrulez/advanced_searh` and it will automatically install.
 
-You can download direct from GitHub or consider using
-the [plugin repository for Roundcube](http://plugins.roundcube.net/)
+### FTP
+Download latest release from Github and upload via FTP to /roundcube_root/plugins/advanced_search.  
+Add to Roundcube main config.inc.php in plugin array  
 
-## Usage
-
-After install, 'Advanced search' will show up under the 'more' menu.
-
-Please use the _'stable'_ brach for deployment.
-
-Advantages:
-
-* This version should be tested and bug-free
-* It uses minified versions of the JavaScript
-
-## Requirements
-Version 2.0.0 requires Roundcube 0.9.4 or later
-
-## License
-
-This plugin is released under the GNU General Public License Version 3
-or later (http://www.gnu.org/licenses/gpl.html).
-
-Even if skins might contain some programming work, they are not considered
-as a linked part of the plugin and therefore skins DO NOT fall under the
-provisions of the GPL license. See the README file located in the core skins
-folder for details on the skin license.
-
-## Download
-
-### GIT :
+### GIT
 * Clone the GitHub repository to 'advanced_search':
 
  >     git clone git://github.com/texxasrulez/roundcube-advanced-search.git advanced_search
@@ -43,11 +18,6 @@ folder for details on the skin license.
 
  >     cd advanced_search
  >     git checkout -b stable origin/stable
-
-### ZIP :
-* Swap branches to 'stable'
-* Click on the 'ZIP' download icon
-* Rename the unziped directory 'advanced_search'
 
 ## Install
 
