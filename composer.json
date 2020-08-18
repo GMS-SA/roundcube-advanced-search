@@ -5,7 +5,7 @@
   "homepage": "https://github.com/texxasrulez/advanced_search",
   "license": "GPL-3.0",
   "type": "roundcube-plugin",
-  "version": "3.3",
+  "version": "3.4",
   "authors": [
     {
       "name": "Gene Hawkins",
