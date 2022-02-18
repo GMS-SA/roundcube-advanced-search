@@ -1,4 +1,6 @@
-#messagetoolbar > a.advanced-search span.advanced-search {
+/* Advanced Search CSS for "Classic" Skin */
+
+#messagetoolbar > a.advanced_search span.advanced_search {
     display: none;
 }
 
@@ -22,13 +24,14 @@
     width: 30%;
 }
 
-#messagetoolbar a.advanced-search {
+#messagetoolbar a.advanced_search {
+	text-indent: -5000px;
     background: url(../../../../skins/classic/images/abook_toolbar.png) 0 0 no-repeat transparent;
     background-position: -168px 0px;
 }
 
-#messagemenu a.advanced-search {
-    color: #a0a0a0;
+#messagemenu a.advanced_search {
+    color: #333;
     text-decoration: none;
     background: url(../../../../skins/classic/images/icons/glass.png) no-repeat 7px 0;
 }

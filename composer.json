@@ -1,23 +1,26 @@
 {
-	"name": "gms-sa/advanced-search",
-	"type": "roundcube-plugin",
-	"description": "Advanced search allowing multiple search criteria and folder recursion",
-	"keywords": ["mail","search","advanced"],
-	"homepage": "http://github.com/GMS-SA/roundcube-advanced-search/tree/stable",
-	"license": "GPL-3.0",
-	"repositories": [
-		{
-			"type": "composer",
-			"url": "http://plugins.roundcube.net"
-		}
-	],
-	"require": {
-		"roundcube/plugin-installer": ">=0.1.2"
-	},
-    "extra": {
-        "roundcube": {
-            "min-version": "0.9.4",
-            "max-version": "1.0.9999"
-        }
+  "name": "texxasrulez/advanced_search",
+  "description": "Add Advanced Search Capabilities",
+  "keywords": ["search","mail","advanced"],
+  "homepage": "https://github.com/texxasrulez/advanced_search",
+  "license": "GPL-3.0",
+  "type": "roundcube-plugin",
+  "version": "3.4",
+  "authors": [
+    {
+      "name": "Gene Hawkins",
+      "email": "texxasrulez@yahoo.com",
+      "role": "Developer"
     }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://plugins.roundcube.net"
+    }
+  ],
+  "require": {
+    "php": ">=5.2.1",
+    "roundcube/plugin-installer": ">=0.1.2"
+  }
 }

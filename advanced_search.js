@@ -2,12 +2,14 @@
     /**
      * The fontend scripts for an advanced search.
      *
-     * @version 2.1.5
+     * @version 2.1.7
      * @licence GNU GPLv3+
      * @author  Wilwert Claude
      * @author  Ludovicy Steve
      * @author  Chris Moules
      * @website http://www.gms.lu
+	 * @author  Gene Hawkins
+     * @website https://www.genesworld.net
      */
 
     $.stack = {
@@ -60,20 +62,22 @@
         $.stack.row = r.row;
         $.stack.html = r.html;
 
-        var $html = $(r.html);
         var saved_searches_label = rcmail.gettext('saved_searches', 'advanced_search');
-        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search"><option value=""></option></select></label></span>';
-        title = $('<div>' + r.title + saved_searches + '<div>');
-        var saved_searches_select = $('[name=select_saved_search]', title);
+        var saved_searches = '<span class="saved_searches"> <label for="select_saved_search">' + saved_searches_label + ': <select name="select_saved_search" id="select_saved_search">';
+        title = r.title;
+        saved_searches = saved_searches + '<option value=""></option>';
         if (r.saved_searches.length) {
             var i;
             for (i in r.saved_searches) {
-                saved_searches_select.append('<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>');
+                    saved_searches = saved_searches + '<option value="' + r.saved_searches[i] + '">' + r.saved_searches[i] + '</option>';
             }
         }
+        saved_searches = saved_searches + '</select></label></span>';
+        $.stack.saved_searches = saved_searches;
+        var $html = $("<div>" + saved_searches + r.html + "</div>");
+        saved_searches_select = $('[name=select_saved_search]', $html);
         $html.dialog({
             width: 640,
-            height: 300,
             resizable: true,
             draggable: true,
             title: title,
@@ -322,7 +326,7 @@
      *
      * @param {object} e The event element
      */
-    $(document).on("click", 'a.icon.advanced-search, a.button.advanced-search', function(e) {
+    $(document).on("click", 'a.icon.advanced_search, a.button.advanced_search', function(e) {
         e.preventDefault();
 
         if (!$('#adsearch-popup').length) {
@@ -351,7 +355,6 @@
         txt['delete'] = rcmail.get_label('advanced_search.delete');
         $( "<p><strong>" + search_name + "</strong></p>" ).dialog({
             resizable: true,
-            height:180,
             modal: true,
             title: rcmail.gettext('advanced_search.deletesearch'),
             buttons: [
